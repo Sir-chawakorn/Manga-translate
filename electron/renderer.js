@@ -1,7 +1,10 @@
 const state = {
   apiKey: localStorage.getItem("geminiApiKey") || "",
   model: localStorage.getItem("geminiModel") || "gemini-2.5-flash-image",
+  source: null,
   image: null,
+  pdf: null,
+  pdfjs: null,
   cleanedImageUrl: null,
   regions: [],
   selectedRegionId: null,
@@ -21,6 +24,9 @@ const elements = {
   fileNameLabel: document.getElementById("fileNameLabel"),
   statusBanner: document.getElementById("statusBanner"),
   warningsBox: document.getElementById("warningsBox"),
+  pdfPanel: document.getElementById("pdfPanel"),
+  pdfMetaLabel: document.getElementById("pdfMetaLabel"),
+  pdfPageGrid: document.getElementById("pdfPageGrid"),
   baseImage: document.getElementById("baseImage"),
   overlayLayer: document.getElementById("overlayLayer"),
   regionList: document.getElementById("regionList"),
@@ -60,23 +66,35 @@ function setWarnings(warnings) {
     elements.warningsBox.innerHTML = "";
     return;
   }
+
   elements.warningsBox.classList.remove("hidden");
   elements.warningsBox.innerHTML = warnings.map((warning) => `<div>${escapeHtml(String(warning))}</div>`).join("");
 }
 
 function escapeHtml(value) {
-  return value
+  return String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
 }
 
-function getSelectedRegion() {
-  return state.regions.find((region) => region.id === state.selectedRegionId) || null;
-}
-
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function stripExtension(fileName) {
+  return String(fileName || "page").replace(/\.[^.]+$/, "");
+}
+
+function resetTranslationState() {
+  state.cleanedImageUrl = null;
+  state.regions = [];
+  state.selectedRegionId = null;
+  setWarnings([]);
+}
+
+function getSelectedRegion() {
+  return state.regions.find((region) => region.id === state.selectedRegionId) || null;
 }
 
 function normalizeRegion(region, index) {
@@ -97,14 +115,81 @@ function normalizeRegion(region, index) {
   };
 }
 
+function dataUrlToUint8Array(dataUrl) {
+  const [, base64] = String(dataUrl || "").split(",", 2);
+  const binaryString = window.atob(base64 || "");
+  const bytes = new Uint8Array(binaryString.length);
+  for (let index = 0; index < binaryString.length; index += 1) {
+    bytes[index] = binaryString.charCodeAt(index);
+  }
+  return bytes;
+}
+
+async function ensurePdfJs() {
+  if (state.pdfjs) {
+    return state.pdfjs;
+  }
+
+  const pdfModuleUrl = new URL(
+    "../node_modules/pdfjs-dist/build/pdf.mjs",
+    window.location.href
+  ).toString();
+  const pdfjsLib = await import(pdfModuleUrl);
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+    "../node_modules/pdfjs-dist/build/pdf.worker.mjs",
+    window.location.href
+  ).toString();
+  state.pdfjs = pdfjsLib;
+  return pdfjsLib;
+}
+
+async function renderPdfPageToDataUrl(page, targetWidth) {
+  const baseViewport = page.getViewport({ scale: 1 });
+  const scale = targetWidth / baseViewport.width;
+  const viewport = page.getViewport({ scale });
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  canvas.width = Math.ceil(viewport.width);
+  canvas.height = Math.ceil(viewport.height);
+
+  await page.render({
+    canvasContext: context,
+    viewport,
+  }).promise;
+
+  const payload = {
+    dataUrl: canvas.toDataURL("image/png"),
+    width: canvas.width,
+    height: canvas.height,
+  };
+  page.cleanup();
+  return payload;
+}
+
+function updateFileLabel() {
+  if (!state.source) {
+    elements.fileNameLabel.textContent = "ยังไม่ได้เลือกไฟล์";
+    return;
+  }
+
+  if (state.source.kind === "pdf" && state.image) {
+    elements.fileNameLabel.textContent = `${state.source.name} • หน้า ${state.image.pageNumber}/${state.image.totalPages}`;
+    return;
+  }
+
+  elements.fileNameLabel.textContent = state.source.name;
+}
+
 function updateButtons() {
-  const hasImage = Boolean(state.image);
+  const hasPage = Boolean(state.image);
   const hasRegions = state.regions.length > 0;
 
-  elements.translateButton.disabled = !hasImage || state.isBusy;
-  elements.exportButton.disabled = !hasImage || !hasRegions || state.isBusy;
-  elements.addRegionButton.disabled = !hasImage || state.isBusy;
+  elements.translateButton.disabled = !hasPage || state.isBusy;
+  elements.exportButton.disabled = !hasPage || !hasRegions || state.isBusy;
+  elements.addRegionButton.disabled = !hasPage || state.isBusy;
   elements.openButton.disabled = state.isBusy;
+  elements.cleanPreviewToggle.disabled = !state.cleanedImageUrl;
 }
 
 function getDisplaySource() {
@@ -148,6 +233,38 @@ function renderBaseImage() {
   if (elements.baseImage.src !== nextSource) {
     elements.baseImage.src = nextSource;
   }
+}
+
+function renderPdfPanel() {
+  if (!state.source || state.source.kind !== "pdf" || !state.pdf) {
+    elements.pdfPanel.classList.add("hidden");
+    return;
+  }
+
+  elements.pdfPanel.classList.remove("hidden");
+  elements.pdfMetaLabel.textContent = state.pdf.loading
+    ? `กำลังสร้าง preview ${state.pdf.pages.length}/${state.pdf.pageCount}`
+    : `${state.pdf.pageCount} หน้า`;
+
+  if (state.pdf.pages.length === 0) {
+    elements.pdfPageGrid.innerHTML = `<div class="pdf-empty">กำลังโหลดหน้า PDF...</div>`;
+    return;
+  }
+
+  elements.pdfPageGrid.innerHTML = state.pdf.pages
+    .map((page) => {
+      const selected = page.pageNumber === state.pdf.selectedPageNumber ? "is-selected" : "";
+      return `
+        <button type="button" class="pdf-page-card ${selected}" data-page-number="${page.pageNumber}">
+          <img class="pdf-page-thumb" src="${page.thumbDataUrl}" alt="PDF page ${page.pageNumber}" />
+          <div class="pdf-page-meta">
+            <span>หน้า ${page.pageNumber}</span>
+            <span>${page.width}×${page.height}</span>
+          </div>
+        </button>
+      `;
+    })
+    .join("");
 }
 
 function renderRegionList() {
@@ -211,7 +328,7 @@ function renderInspector() {
 
 function makeTextRegionElement(region) {
   const metrics = state.stageMetrics;
-  if (!metrics) {
+  if (!metrics || !state.image) {
     return null;
   }
 
@@ -238,6 +355,7 @@ function makeTextRegionElement(region) {
     if (!state.stageMetrics) {
       return;
     }
+
     const target = event.target;
     const mode = target.classList.contains("resize-handle") ? "resize" : "move";
     state.selectedRegionId = region.id;
@@ -276,7 +394,9 @@ function renderRegions() {
 }
 
 function renderAll() {
+  updateFileLabel();
   renderBaseImage();
+  renderPdfPanel();
   renderRegionList();
   renderInspector();
   renderRegions();
@@ -471,7 +591,7 @@ async function exportImage() {
 
   const exportResult = await window.mangaStudio.saveExport({
     dataUrl: canvas.toDataURL("image/png"),
-    suggestedName: `${state.image.name.replace(/\.[^.]+$/, "")}-thai.png`,
+    suggestedName: `${stripExtension(state.image.name)}-thai.png`,
   });
 
   if (!exportResult.canceled) {
@@ -479,26 +599,120 @@ async function exportImage() {
   }
 }
 
-async function openImage() {
-  const result = await window.mangaStudio.pickImage();
+async function selectPdfPage(pageNumber) {
+  if (!state.pdf || !state.source) {
+    return;
+  }
+
+  state.isBusy = true;
+  updateButtons();
+  resetTranslationState();
+  setStatus(`กำลังเรนเดอร์หน้า ${pageNumber}...`);
+
+  try {
+    const page = await state.pdf.doc.getPage(pageNumber);
+    const rendered = await renderPdfPageToDataUrl(page, 1600);
+    state.pdf.selectedPageNumber = pageNumber;
+    state.image = {
+      name: `${stripExtension(state.source.name)}-page-${String(pageNumber).padStart(3, "0")}.png`,
+      dataUrl: rendered.dataUrl,
+      width: rendered.width,
+      height: rendered.height,
+      pageNumber,
+      totalPages: state.pdf.pageCount,
+      sourceKind: "pdf",
+    };
+    elements.cleanPreviewToggle.checked = true;
+    setStatus(`เลือกหน้า ${pageNumber}/${state.pdf.pageCount} แล้ว พร้อมแปลเป็นไทย`, "success");
+  } catch (error) {
+    setStatus(error.message || "PDF page rendering failed.", "error");
+  } finally {
+    state.isBusy = false;
+    renderAll();
+  }
+}
+
+async function loadPdfSource(file) {
+  state.isBusy = true;
+  state.pdf = null;
+  state.image = null;
+  resetTranslationState();
+  renderAll();
+  setStatus("กำลังโหลด PDF และสร้าง preview...");
+
+  try {
+    const pdfjsLib = await ensurePdfJs();
+    const pdfBytes = dataUrlToUint8Array(file.dataUrl);
+    const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
+    const pdfDoc = await loadingTask.promise;
+
+    state.pdf = {
+      doc: pdfDoc,
+      pageCount: pdfDoc.numPages,
+      pages: [],
+      selectedPageNumber: 1,
+      loading: true,
+    };
+    renderAll();
+
+    for (let pageNumber = 1; pageNumber <= pdfDoc.numPages; pageNumber += 1) {
+      setStatus(`กำลังสร้าง preview หน้า ${pageNumber}/${pdfDoc.numPages}...`);
+      const page = await pdfDoc.getPage(pageNumber);
+      const thumbnail = await renderPdfPageToDataUrl(page, 220);
+      state.pdf.pages.push({
+        pageNumber,
+        thumbDataUrl: thumbnail.dataUrl,
+        width: thumbnail.width,
+        height: thumbnail.height,
+      });
+      renderPdfPanel();
+    }
+
+    state.pdf.loading = false;
+    await selectPdfPage(1);
+  } catch (error) {
+    state.pdf = null;
+    state.image = null;
+    setStatus(error.message || "PDF preview failed.", "error");
+  } finally {
+    state.isBusy = false;
+    renderAll();
+  }
+}
+
+async function openFile() {
+  const result = await window.mangaStudio.pickFile();
   if (result.canceled) {
     return;
   }
 
-  state.image = {
+  state.source = {
     path: result.path,
+    name: result.name,
+    dataUrl: result.dataUrl,
+    fileUrl: result.fileUrl,
+    kind: result.kind,
+    mimeType: result.mimeType,
+  };
+
+  if (result.kind === "pdf") {
+    await loadPdfSource(result);
+    return;
+  }
+
+  state.pdf = null;
+  state.image = {
     name: result.name,
     dataUrl: result.dataUrl,
     fileUrl: result.fileUrl,
     width: 0,
     height: 0,
+    pageNumber: 1,
+    totalPages: 1,
+    sourceKind: "image",
   };
-  state.cleanedImageUrl = null;
-  state.regions = [];
-  state.selectedRegionId = null;
-  elements.fileNameLabel.textContent = result.name;
   elements.cleanPreviewToggle.checked = true;
-  setWarnings([]);
+  resetTranslationState();
   setStatus("โหลดภาพแล้ว พร้อมแปลเป็นไทย");
   renderAll();
 }
@@ -510,7 +724,11 @@ async function translateImage() {
 
   state.isBusy = true;
   updateButtons();
-  setStatus("กำลังส่งภาพไปให้ Gemini วิเคราะห์และแปล...", "default");
+
+  const statusLabel = state.source?.kind === "pdf"
+    ? `กำลังส่งหน้า ${state.image.pageNumber} ไปให้ Gemini วิเคราะห์และแปล...`
+    : "กำลังส่งภาพไปให้ Gemini วิเคราะห์และแปล...";
+  setStatus(statusLabel, "default");
 
   try {
     const apiKey = elements.apiKeyInput.value.trim();
@@ -519,7 +737,8 @@ async function translateImage() {
     localStorage.setItem("geminiModel", model);
 
     const data = await window.mangaStudio.translateImage({
-      filePath: state.image.path,
+      imageDataUrl: state.image.dataUrl,
+      fileName: state.image.name,
       apiKey,
       model,
     });
@@ -615,7 +834,7 @@ function attachGeneralHandlers() {
   elements.apiKeyInput.value = state.apiKey;
   elements.modelInput.value = state.model;
 
-  elements.openButton.addEventListener("click", openImage);
+  elements.openButton.addEventListener("click", openFile);
   elements.translateButton.addEventListener("click", translateImage);
   elements.exportButton.addEventListener("click", exportImage);
   elements.addRegionButton.addEventListener("click", addRegion);
@@ -630,6 +849,18 @@ function attachGeneralHandlers() {
       return;
     }
     selectRegion(button.dataset.regionId);
+  });
+
+  elements.pdfPageGrid.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-page-number]");
+    if (!button || state.isBusy) {
+      return;
+    }
+    const pageNumber = Number(button.dataset.pageNumber);
+    if (!Number.isFinite(pageNumber) || pageNumber === state.pdf?.selectedPageNumber) {
+      return;
+    }
+    await selectPdfPage(pageNumber);
   });
 
   elements.baseImage.addEventListener("load", () => {

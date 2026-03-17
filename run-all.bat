@@ -28,6 +28,12 @@ if not exist "node_modules\electron" (
   if errorlevel 1 goto :error
 )
 
+if not exist "node_modules\pdfjs-dist" (
+  echo [INFO] PDF support package is missing. Running setup...
+  call setup.bat
+  if errorlevel 1 goto :error
+)
+
 echo [RUN] Starting Manga Translate Studio...
 call npm start
 if errorlevel 1 goto :error
@@ -39,4 +45,3 @@ echo.
 echo [ERROR] App failed to start.
 pause
 exit /b 1
-

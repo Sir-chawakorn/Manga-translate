@@ -169,6 +169,74 @@ body {
   background-size: 28px 28px;
 }
 
+.pdf-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(183, 167, 146, 0.52);
+  background: rgba(255, 250, 244, 0.78);
+}
+
+.pdf-page-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 142px;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.pdf-page-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(183, 167, 146, 0.52);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  cursor: pointer;
+  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.pdf-page-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(196, 93, 36, 0.55);
+}
+
+.pdf-page-card.is-selected {
+  border-color: rgba(196, 93, 36, 0.9);
+  box-shadow: 0 14px 32px rgba(196, 93, 36, 0.15);
+}
+
+.pdf-page-thumb {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid rgba(183, 167, 146, 0.36);
+  background: linear-gradient(180deg, rgba(245, 240, 234, 0.85), rgba(255, 255, 255, 0.95));
+}
+
+.pdf-page-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.pdf-empty {
+  padding: 18px;
+  min-width: 260px;
+  border: 1px dashed rgba(184, 171, 147, 0.75);
+  border-radius: 18px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.6);
+}
+
 .stage-canvas {
   position: relative;
   min-height: 100%;

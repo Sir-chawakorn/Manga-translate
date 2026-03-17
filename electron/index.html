@@ -12,7 +12,7 @@
         <div class="title-wrap">
           <p class="eyebrow">Gemini Nano Banana + Electron + Python</p>
           <h1>Manga Translate Studio</h1>
-          <p class="subtle">เปิดภาพมังงะ, ให้ Gemini แปลเป็นไทย, ปรับข้อความก่อน export ได้</p>
+          <p class="subtle">เปิดภาพหรือ PDF, preview หน้า, เลือกหน้าที่ต้องการ, แล้วค่อยแปลและแก้ข้อความได้</p>
         </div>
 
         <div class="toolbar">
@@ -26,7 +26,7 @@
             <input id="modelInput" type="text" value="gemini-2.5-flash-image" />
           </label>
 
-          <button id="openButton" class="button secondary">เปิดภาพ</button>
+          <button id="openButton" class="button secondary">เปิดภาพ / PDF</button>
           <button id="translateButton" class="button primary">แปลเป็นไทย</button>
           <button id="addRegionButton" class="button secondary">เพิ่มกล่องข้อความ</button>
           <button id="exportButton" class="button secondary">Export PNG</button>
@@ -49,6 +49,16 @@
           </div>
 
           <div id="statusBanner" class="status-banner">พร้อมใช้งาน</div>
+
+          <section id="pdfPanel" class="pdf-panel hidden">
+            <div class="panel-head">
+              <h2>เลือกหน้า PDF</h2>
+              <span id="pdfMetaLabel" class="pill">0 หน้า</span>
+            </div>
+            <div id="pdfPageGrid" class="pdf-page-grid">
+              <div class="pdf-empty">เปิดไฟล์ PDF เพื่อ preview และเลือกหน้าที่ต้องการแปล</div>
+            </div>
+          </section>
 
           <div class="stage-frame">
             <div id="stageCanvas" class="stage-canvas">

@@ -20,8 +20,21 @@ function lookupMimeType(filePath) {
     ".webp": "image/webp",
     ".gif": "image/gif",
     ".bmp": "image/bmp",
+    ".pdf": "application/pdf",
   };
   return map[ext] || "application/octet-stream";
+}
+
+function parseDataUrl(dataUrl) {
+  const match = /^data:([^;]+);base64,(.+)$/s.exec(dataUrl || "");
+  if (!match) {
+    throw new Error("Invalid file payload.");
+  }
+
+  return {
+    mimeType: match[1],
+    buffer: Buffer.from(match[2], "base64"),
+  };
 }
 
 function resolvePythonCommand() {
@@ -103,14 +116,22 @@ function createWindow() {
   window.loadFile(entryHtml);
 }
 
-ipcMain.handle("pick-image", async () => {
+ipcMain.handle("pick-file", async () => {
   const result = await dialog.showOpenDialog({
-    title: "Open manga page",
+    title: "Open manga image or PDF",
     properties: ["openFile"],
     filters: [
       {
+        name: "Images and PDF",
+        extensions: ["png", "jpg", "jpeg", "webp", "gif", "bmp", "pdf"],
+      },
+      {
         name: "Images",
         extensions: ["png", "jpg", "jpeg", "webp", "gif", "bmp"],
+      },
+      {
+        name: "PDF",
+        extensions: ["pdf"],
       },
     ],
   });
@@ -122,28 +143,44 @@ ipcMain.handle("pick-image", async () => {
   const filePath = result.filePaths[0];
   const mimeType = lookupMimeType(filePath);
   const buffer = fs.readFileSync(filePath);
+  const kind = mimeType === "application/pdf" ? "pdf" : "image";
 
   return {
     canceled: false,
     path: filePath,
     name: path.basename(filePath),
+    kind,
+    mimeType,
     dataUrl: `data:${mimeType};base64,${buffer.toString("base64")}`,
     fileUrl: pathToFileURL(filePath).toString(),
   };
 });
 
 ipcMain.handle("translate-image", async (_event, payload) => {
-  const { filePath, apiKey, model } = payload || {};
-  if (!filePath) {
+  const { filePath, imageDataUrl, fileName, apiKey, model } = payload || {};
+  if (!filePath && !imageDataUrl) {
     throw new Error("No image selected.");
   }
 
   await waitForBackend();
 
-  const fileBuffer = fs.readFileSync(filePath);
-  const mimeType = lookupMimeType(filePath);
+  let fileBuffer;
+  let mimeType;
+  let resolvedFileName;
+
+  if (imageDataUrl) {
+    const parsed = parseDataUrl(imageDataUrl);
+    fileBuffer = parsed.buffer;
+    mimeType = parsed.mimeType;
+    resolvedFileName = fileName || "page.png";
+  } else {
+    fileBuffer = fs.readFileSync(filePath);
+    mimeType = lookupMimeType(filePath);
+    resolvedFileName = path.basename(filePath);
+  }
+
   const form = new FormData();
-  form.append("file", new Blob([fileBuffer], { type: mimeType }), path.basename(filePath));
+  form.append("file", new Blob([fileBuffer], { type: mimeType }), resolvedFileName);
   form.append("model", model || "gemini-2.5-flash-image");
   if (apiKey) {
     form.append("api_key", apiKey);
