@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manga Translate Studio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="title-wrap">
+          <p class="eyebrow">Gemini Nano Banana + Electron + Python</p>
+          <h1>Manga Translate Studio</h1>
+          <p class="subtle">เปิดภาพมังงะ, ให้ Gemini แปลเป็นไทย, ปรับข้อความก่อน export ได้</p>
+        </div>
+
+        <div class="toolbar">
+          <label class="field compact">
+            <span>Gemini API Key</span>
+            <input id="apiKeyInput" type="password" placeholder="AIza..." autocomplete="off" />
+          </label>
+
+          <label class="field compact">
+            <span>Model</span>
+            <input id="modelInput" type="text" value="gemini-2.5-flash-image" />
+          </label>
+
+          <button id="openButton" class="button secondary">เปิดภาพ</button>
+          <button id="translateButton" class="button primary">แปลเป็นไทย</button>
+          <button id="addRegionButton" class="button secondary">เพิ่มกล่องข้อความ</button>
+          <button id="exportButton" class="button secondary">Export PNG</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="stage-panel">
+          <div class="stage-meta">
+            <div>
+              <p class="meta-label">ไฟล์</p>
+              <p id="fileNameLabel" class="meta-value">ยังไม่ได้เลือกภาพ</p>
+            </div>
+            <div class="toggle-row">
+              <label class="toggle">
+                <input id="cleanPreviewToggle" type="checkbox" checked />
+                <span>ใช้ AI clean preview</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="statusBanner" class="status-banner">พร้อมใช้งาน</div>
+
+          <div class="stage-frame">
+            <div id="stageCanvas" class="stage-canvas">
+              <img id="baseImage" alt="Manga page preview" />
+              <div id="overlayLayer" class="overlay-layer"></div>
+            </div>
+          </div>
+
+          <div id="warningsBox" class="warnings-box hidden"></div>
+        </section>
+
+        <aside class="sidebar">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>รายการข้อความ</h2>
+              <span id="regionCountPill" class="pill">0 กล่อง</span>
+            </div>
+            <div id="regionList" class="region-list empty">ยังไม่มีข้อความที่ตรวจพบ</div>
+          </section>
+
+          <section class="panel inspector">
+            <div class="panel-head">
+              <h2>แก้ไขข้อความ</h2>
+              <button id="deleteRegionButton" class="text-button">ลบกล่อง</button>
+            </div>
+
+            <div id="emptyInspector" class="empty-inspector">เลือกกล่องข้อความจากภาพหรือจากรายการด้านบน</div>
+
+            <div id="inspectorFields" class="inspector-fields hidden">
+              <label class="field">
+                <span>ประเภท</span>
+                <input id="kindInput" type="text" />
+              </label>
+
+              <label class="field">
+                <span>ต้นฉบับ</span>
+                <textarea id="sourceInput" rows="3" readonly></textarea>
+              </label>
+
+              <label class="field">
+                <span>คำแปลภาษาไทย</span>
+                <textarea id="translatedInput" rows="5"></textarea>
+              </label>
+
+              <div class="grid-two">
+                <label class="field">
+                  <span>X %</span>
+                  <input id="xInput" type="number" min="0" max="100" step="0.1" />
+                </label>
+                <label class="field">
+                  <span>Y %</span>
+                  <input id="yInput" type="number" min="0" max="100" step="0.1" />
+                </label>
+              </div>
+
+              <div class="grid-two">
+                <label class="field">
+                  <span>กว้าง %</span>
+                  <input id="widthInput" type="number" min="1" max="100" step="0.1" />
+                </label>
+                <label class="field">
+                  <span>สูง %</span>
+                  <input id="heightInput" type="number" min="1" max="100" step="0.1" />
+                </label>
+              </div>
+
+              <div class="grid-two">
+                <label class="field">
+                  <span>Font px</span>
+                  <input id="fontSizeInput" type="number" min="10" max="120" step="1" />
+                </label>
+                <label class="field">
+                  <span>จัดวาง</span>
+                  <select id="alignmentInput">
+                    <option value="left">left</option>
+                    <option value="center">center</option>
+                    <option value="right">right</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="grid-two">
+                <label class="field">
+                  <span>สีตัวอักษร</span>
+                  <input id="textColorInput" type="text" placeholder="#111111" />
+                </label>
+                <label class="field">
+                  <span>สีพื้นหลัง</span>
+                  <input id="backgroundColorInput" type="text" placeholder="rgba(255,255,255,0.92)" />
+                </label>
+              </div>
+
+              <label class="field">
+                <span>โน้ต</span>
+                <input id="notesInput" type="text" />
+              </label>
+            </div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <script src="./renderer.js"></script>
+  </body>
+</html>
