@@ -1,0 +1,13 @@
+The Thai font files in this directory are from Google Fonts and are licensed
+under the SIL Open Font License, Version 1.1.
+
+https://scripts.sil.org/OFL
+
+Included fonts:
+- Noto Sans Thai — Copyright 2022 The Noto Project Authors (https://github.com/notofonts/thai)
+- Sarabun — Copyright (c) 2013-2014, Suppakit Chalermlarp (https://github.com/nicholasl/sarabun)
+- Kanit — Copyright (c) 2015, Cadson Demak (https://github.com/nicholasl/kanit)
+- Prompt — Copyright (c) 2015, Cadson Demak (https://github.com/nicholasl/prompt)
+- K2D — Copyright (c) 2018, Cadson Demak (https://github.com/nicholasl/k2d)
+- Itim — Copyright (c) 2015, Cadson Demak (https://github.com/nicholasl/itim)
+- Chakra Petch — Copyright (c) 2018, Cadson Demak (https://github.com/nicholasl/chakrapetch)

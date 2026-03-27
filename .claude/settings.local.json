@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip list:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\(''backend/app/ctd_service.py''\\).read\\(\\)\\); print\\(''ctd_service.py: OK''\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\(''backend/app/lama_service.py''\\).read\\(\\)\\); print\\(''lama_service.py: OK''\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\(''models/download_model.py''\\).read\\(\\)\\); print\\(''download_model.py: OK''\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\(''backend/app/gemini_service.py''\\).read\\(\\)\\); print\\(''gemini_service.py: OK''\\)\")",
+      "Bash(ls -la \"c:/Users/chawa/Downloads/Manga translate/models/\"*.onnx)",
+      "Bash(python -c \"import onnxruntime; print\\(''onnxruntime OK''\\); import PIL; print\\(''PIL OK''\\)\")",
+      "Bash(pip install:*)",
+      "Bash(python download_model.py lama)",
+      "Bash(python download_model.py ctd)",
+      "Bash(python -X utf8 -c \":*)"
+    ]
+  }
+}

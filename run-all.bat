@@ -15,7 +15,7 @@ if not exist ".venv\Scripts\python.exe" (
   if errorlevel 1 goto :error
 )
 
-".venv\Scripts\python.exe" -c "import fastapi, google.genai, uvicorn, PIL, dotenv" >nul 2>nul
+".venv\Scripts\python.exe" -c "import fastapi, google.genai, uvicorn, PIL, dotenv, fitz" >nul 2>nul
 if errorlevel 1 (
   echo [INFO] Python packages are missing. Running setup...
   call setup.bat
@@ -24,12 +24,6 @@ if errorlevel 1 (
 
 if not exist "node_modules\electron" (
   echo [INFO] Node packages are missing. Running setup...
-  call setup.bat
-  if errorlevel 1 goto :error
-)
-
-if not exist "node_modules\pdfjs-dist" (
-  echo [INFO] PDF support package is missing. Running setup...
   call setup.bat
   if errorlevel 1 goto :error
 )

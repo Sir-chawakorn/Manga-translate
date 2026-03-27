@@ -5,162 +5,490 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manga Translate Studio</title>
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="preload" href="./fonts/NotoSansThai-Regular.ttf" as="font" type="font/ttf" crossorigin />
+    <link rel="preload" href="./fonts/Kanit-Regular.ttf" as="font" type="font/ttf" crossorigin />
   </head>
-  <body>
-    <div class="app-shell">
+  <body data-theme="dark">
+    <div class="app">
+      <!-- ═══ TOP BAR (2 rows, compact like Photoshop) ═══ -->
       <header class="topbar">
-        <div class="title-wrap">
-          <p class="eyebrow">Gemini Nano Banana + Electron + Python</p>
-          <h1>Manga Translate Studio</h1>
-          <p class="subtle">เปิดภาพหรือ PDF, preview หน้า, เลือกหน้าที่ต้องการ, แล้วค่อยแปลและแก้ข้อความได้</p>
+        <!-- Row 1: Brand + File info + Primary actions -->
+        <div class="topbar__row topbar__row--main">
+          <div class="topbar__brand">
+            <div class="topbar__brand-copy">
+              <span class="topbar__eyebrow">Manga Translate Studio</span>
+              <h1 class="topbar__title">MTS</h1>
+            </div>
+            <code id="latestModelValue" class="topbar__model" data-tip="โมเดล AI" data-tip-pos="bottom">gemini-3-pro-image-preview</code>
+          </div>
+          <div class="topbar__cluster topbar__cluster--file">
+            <button id="openButton" class="btn btn--secondary btn--sm" data-tip="เปิดไฟล์ (Ctrl+O)" data-tip-pos="bottom">เปิดไฟล์</button>
+            <button id="saveButton" class="btn btn--ghost btn--sm" data-tip="บันทึก (Ctrl+S)" data-tip-pos="bottom">บันทึก</button>
+            <button id="undoButton" class="btn btn--ghost btn--xs" data-tip="เลิกทำ (Ctrl+Z)" data-tip-pos="bottom" disabled>↩</button>
+            <button id="redoButton" class="btn btn--ghost btn--xs" data-tip="ทำซ้ำ (Ctrl+Y)" data-tip-pos="bottom" disabled>↪</button>
+          </div>
+          <div class="topbar__cluster topbar__cluster--primary">
+            <button id="translateButton" class="btn btn--primary btn--sm" data-tip="แปลด้วย Gemini AI" data-tip-pos="bottom">แปลเป็นไทย</button>
+            <button id="translateModeButton" class="btn btn--ghost btn--sm" data-tip="เลือกโหมดการแปล" data-tip-pos="bottom">โหมดแปล</button>
+            <button id="cleanOnlyButton" class="btn btn--ghost btn--sm" data-tip="ลบข้อความอย่างเดียว" data-tip-pos="bottom">ลบข้อความ</button>
+            <button id="cleanSuggestButton" class="btn btn--ghost btn--sm" data-tip="ลบข้อความแล้วสร้าง Suggest จาก Gemini OCR + SQL RAG" data-tip-pos="bottom">ลบ + Suggest</button>
+            <button id="addRegionButton" class="btn btn--ghost btn--sm" data-tip="เพิ่มกล่องข้อความ" data-tip-pos="bottom">เพิ่มกล่อง</button>
+            <button id="previewButton" class="btn btn--ghost btn--sm" data-tip="ดูตัวอย่างก่อนส่งออก" data-tip-pos="bottom">ดูตัวอย่าง</button>
+            <button id="exportButton" class="btn btn--secondary btn--sm" data-tip="ส่งออกไฟล์งาน" data-tip-pos="bottom">ส่งออก</button>
+          </div>
+
+          <div class="topbar__spacer"></div>
+
+          <div class="topbar__cluster topbar__cluster--utility">
+            <input id="apiKeyInput" class="topbar__apikey" type="password" placeholder="Gemini API Key" autocomplete="off" data-tip="Gemini API Key" data-tip-pos="bottom" />
+            <button id="themeToggleButton" class="btn btn--icon btn--sm" data-tip="สลับโหมดสว่าง/มืด" data-tip-pos="bottom">🌙</button>
+          </div>
         </div>
 
-        <div class="toolbar">
-          <label class="field compact">
-            <span>Gemini API Key</span>
-            <input id="apiKeyInput" type="password" placeholder="AIza..." autocomplete="off" />
-          </label>
+        <!-- Row 2: File name + Status + View controls -->
+        <div class="topbar__row topbar__row--sub">
+          <div class="topbar__context">
+            <span id="fileNameLabel" class="topbar__filename">ยังไม่ได้เลือกไฟล์</span>
+            <span id="statusBanner" class="topbar__status" role="status" aria-live="polite">พร้อมใช้งาน</span>
+          </div>
 
-          <label class="field compact">
-            <span>Model</span>
-            <input id="modelInput" type="text" value="gemini-2.5-flash-image" />
-          </label>
+          <div class="topbar__spacer"></div>
 
-          <button id="openButton" class="button secondary">เปิดภาพ / PDF</button>
-          <button id="translateButton" class="button primary">แปลเป็นไทย</button>
-          <button id="addRegionButton" class="button secondary">เพิ่มกล่องข้อความ</button>
-          <button id="exportButton" class="button secondary">Export PNG</button>
+          <div class="topbar__cluster topbar__cluster--preference">
+            <label class="topbar__toggle" data-tip="แสดงภาพที่ลบข้อความแล้ว" data-tip-pos="bottom">
+              <input id="cleanPreviewToggle" type="checkbox" checked />
+              <span>ภาพสะอาด</span>
+            </label>
+            <label class="topbar__toggle" data-tip="บันทึกอัตโนมัติ" data-tip-pos="bottom">
+              <input id="autoSaveToggle" type="checkbox" />
+              <span>บันทึกอัตโนมัติ</span>
+            </label>
+            <button id="historyCacheButton" class="btn btn--ghost btn--sm" data-tip="ดู history และ cache" data-tip-pos="bottom">History</button>
+            <select id="autoSaveInterval" class="topbar__autosave-select" data-tip="กำหนดช่วงบันทึกอัตโนมัติ" data-tip-pos="bottom">
+              <option value="30">30 วิ</option>
+              <option value="60" selected>1 นาที</option>
+              <option value="120">2 นาที</option>
+              <option value="300">5 นาที</option>
+              <option value="600">10 นาที</option>
+            </select>
+          </div>
+          <span class="zoom-controls" data-tip="ซูม (Ctrl+Scroll)" data-tip-pos="bottom">
+            <button id="zoomOutBtn" class="btn btn--icon btn--xs">−</button>
+            <span id="zoomPill" class="zoom-controls__pill">100%</span>
+            <button id="zoomInBtn" class="btn btn--icon btn--xs">+</button>
+          </span>
         </div>
       </header>
 
+      <!-- Opacity widget removed from here — placed inside stage -->
+
+      <section id="recentFilesSection" class="recent-files-shell" aria-labelledby="recentFilesTitle">
+        <div class="recent-files-shell__head">
+          <div class="recent-files-shell__copy">
+            <h2 id="recentFilesTitle" class="recent-files-shell__title">ไฟล์ล่าสุด</h2>
+            <p class="recent-files-shell__hint">กลับมาเปิดงานต่อได้ทันที</p>
+          </div>
+          <button id="recentFilesClearButton" class="btn btn--xs btn--ghost recent-files-shell__clear" type="button" disabled data-tip="ล้างรายการล่าสุด">
+            ล้างรายการ
+          </button>
+        </div>
+
+        <div id="recentFilesList" class="recent-files-list" aria-live="polite">
+          <div id="recentFilesEmpty" class="recent-files-empty">
+            <span class="recent-files-empty__label">ยังไม่มีไฟล์ล่าสุด</span>
+            <span class="recent-files-empty__detail">เปิดโปรเจกต์ รูปภาพ หรือ PDF เพื่อเริ่มงานได้เลย</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ WORKSPACE ═══ -->
       <main class="workspace">
-        <section class="stage-panel">
-          <div class="stage-meta">
-            <div>
-              <p class="meta-label">ไฟล์</p>
-              <p id="fileNameLabel" class="meta-value">ยังไม่ได้เลือกภาพ</p>
-            </div>
-            <div class="toggle-row">
-              <label class="toggle">
-                <input id="cleanPreviewToggle" type="checkbox" checked />
-                <span>ใช้ AI clean preview</span>
-              </label>
-            </div>
+
+        <!-- ─── LEFT: PDF Filmstrip ─── -->
+        <aside id="pdfPanel" class="filmstrip hidden">
+          <div class="filmstrip__head">
+            <span id="pdfMetaLabel" class="filmstrip__count">0 หน้า</span>
+            <button id="pdfClearSelectionButton" class="btn btn--xs btn--ghost hidden" data-tip="ยกเลิกเลือก">ล้าง</button>
           </div>
 
-          <div id="statusBanner" class="status-banner">พร้อมใช้งาน</div>
-
-          <section id="pdfPanel" class="pdf-panel hidden">
-            <div class="panel-head">
-              <h2>เลือกหน้า PDF</h2>
-              <span id="pdfMetaLabel" class="pill">0 หน้า</span>
+          <div class="filmstrip__nav">
+            <button id="pdfPrevButton" class="btn btn--xs btn--ghost" data-pdf-action="previous-page" data-tip="หน้าก่อนหน้า">&#9650;</button>
+            <div class="filmstrip__jump">
+              <input id="pdfPageInput" class="filmstrip__input" type="number" min="1" step="1" data-pdf-input="page-number" data-tip="เลขหน้า" />
+              <button id="pdfJumpButton" class="btn btn--xs btn--secondary" data-pdf-action="jump-page" data-tip="ข้ามไปหน้านี้">ไป</button>
             </div>
-            <div id="pdfPageGrid" class="pdf-page-grid">
-              <div class="pdf-empty">เปิดไฟล์ PDF เพื่อ preview และเลือกหน้าที่ต้องการแปล</div>
-            </div>
-          </section>
+            <button id="pdfNextButton" class="btn btn--xs btn--ghost" data-pdf-action="next-page" data-tip="หน้าถัดไป">&#9660;</button>
+          </div>
 
+          <div id="pdfPageGrid" class="filmstrip__list" data-pdf-role="page-grid" aria-live="polite">
+            <div class="filmstrip__empty">เปิด PDF เพื่อดูหน้า</div>
+          </div>
+
+          <div class="filmstrip__summary">
+            <span id="pdfSelectedCountPill" class="badge" data-pdf-summary="selected-count">0</span>
+            <span id="pdfActivePagePill" class="badge badge--accent" data-pdf-summary="active-page">-</span>
+            <span id="pdfSelectedLabel" class="sr-only" data-pdf-role="active-page-label" aria-live="polite">ยังไม่ได้เลือกหน้า</span>
+          </div>
+        </aside>
+
+        <!-- ─── CENTER: Canvas ─── -->
+        <section class="canvas-area">
           <div class="stage-frame">
             <div id="stageCanvas" class="stage-canvas">
-              <img id="baseImage" alt="Manga page preview" />
+              <div id="stageEmpty" class="stage-empty">
+                <div class="stage-empty__icon">&#9998;</div>
+                <p>เปิดภาพหรือ PDF เพื่อเริ่มแปลมังงะ</p>
+              </div>
+              <img id="originalImage" class="original-image" alt="" draggable="false" />
+              <img id="baseImage" alt="ภาพตัวอย่างหน้า" />
               <div id="overlayLayer" class="overlay-layer"></div>
+              <!-- Translation loading overlay -->
+              <div id="translatingOverlay" class="translating-overlay hidden">
+                <div class="translating-overlay__scan-line"></div>
+                <div class="translating-overlay__center">
+                  <div class="translating-overlay__ring"></div>
+                  <div class="translating-overlay__ring translating-overlay__ring--2"></div>
+                  <div class="translating-overlay__ring translating-overlay__ring--3"></div>
+                  <div class="translating-overlay__icon">AI</div>
+                </div>
+                <div class="translating-overlay__text">
+                  <span id="translatingLabel">กำลังวิเคราะห์และแปล...</span>
+                  <div class="translating-overlay__progress">
+                    <div class="translating-overlay__progress-track">
+                      <div id="translatingProgressBar" class="translating-overlay__progress-fill" style="width: 0%"></div>
+                    </div>
+                    <span id="translatingPercent" class="translating-overlay__percent">0%</span>
+                  </div>
+                  <span id="translatingStep" class="translating-overlay__step"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="warningsBox" class="warnings-box hidden"></div>
+          <!-- Opacity widget inside stage -->
+          <div id="opacityWidget" class="opacity-widget">
+            <label class="opacity-widget__label">ความทึบ</label>
+            <input id="cleanOpacitySlider" type="range" min="0" max="100" value="100" class="opacity-widget__slider" />
+            <span id="cleanOpacityValue" class="opacity-widget__value">100%</span>
+          </div>
+        </section>
+
+        <!-- ─── RIGHT: Editor Panel ─── -->
+        <aside class="editor">
+          <!-- Inspector (compact, no scroll) -->
+          <div id="inspectorSection" class="editor__section editor__inspector">
+            <div class="editor__head editor__head--regions">
+              <h3 class="editor__title">แก้ไข</h3>
+              <button id="acceptSuggestionButton" class="btn btn--xs btn--ghost hidden" data-tip="ยืนยันคำแปล Suggest ของกล่องนี้">ยืนยัน Suggest</button>
+              <button id="deleteRegionButton" class="btn btn--xs btn--danger" data-tip="ลบกล่องนี้ (Del)">ลบ</button>
+            </div>
+
+            <div id="emptyInspector" class="editor__empty-inline">เลือกกล่องจากภาพ</div>
+
+            <div id="inspectorFields" class="inspector hidden">
+              <section class="inspector-group">
+                <div class="inspector-group__title">เนื้อหา</div>
+                <div class="field-row field-row--2col">
+                  <label class="field"><span>ประเภท</span><input id="kindInput" type="text" /></label>
+                  <label class="field"><span>ต้นฉบับ</span><input id="sourceInput" type="text" readonly /></label>
+                </div>
+
+                <label class="field field--grow">
+                  <span>คำแปล</span>
+                  <textarea id="translatedInput" rows="2"></textarea>
+                </label>
+              </section>
+
+              <section class="inspector-group">
+                <div class="inspector-group__title">ตัวอักษร</div>
+                <div class="field">
+                  <span>ฟอนต์</span>
+                  <div class="font-picker" id="fontPicker">
+                    <button type="button" class="font-picker__trigger" id="fontPickerTrigger">
+                      <span class="font-picker__label" id="fontPickerLabel">เลือกฟอนต์</span>
+                      <span class="font-picker__arrow">▾</span>
+                    </button>
+                    <div class="font-picker__dropdown hidden" id="fontPickerDropdown">
+                      <input type="text" class="font-picker__search" id="fontPickerSearch" placeholder="ค้นหา..." />
+                      <div class="font-picker__list" id="fontPickerList"></div>
+                    </div>
+                  </div>
+                  <select id="fontFamilyInput" class="font-family-select" style="display:none"></select>
+                </div>
+
+                <div class="field-row field-row--3col">
+                  <label class="field"><span>ขนาด</span>
+                    <select id="fontSizeInput">
+                      <option value="14">14</option><option value="18">18</option>
+                      <option value="22">22</option><option value="28" selected>28</option>
+                      <option value="32">32</option><option value="40">40</option>
+                      <option value="48">48</option><option value="64">64</option>
+                      <option value="80">80</option><option value="96">96</option>
+                      <option value="custom">...</option>
+                    </select>
+                  </label>
+                  <label class="field"><span>px</span><input id="fontSizeCustomInput" type="number" min="10" max="120" step="1" /></label>
+                  <label class="field"><span>จัด</span>
+                    <select id="alignmentInput">
+                      <option value="left">L</option><option value="center">C</option><option value="right">R</option>
+                    </select>
+                  </label>
+                </div>
+              </section>
+
+              <section class="inspector-group">
+                <div class="inspector-group__title">สไตล์</div>
+                <div class="field-row field-row--2col">
+                  <label class="field"><span>สี</span><input id="textColorInput" type="color" value="#111111" /></label>
+                  <label class="field"><span>พื้น</span><input id="backgroundColorInput" type="text" placeholder="rgba..." /></label>
+                </div>
+
+                <div class="field-row field-row--2col">
+                  <label class="field"><span>ขอบ</span><input id="textStrokeColorInput" type="color" value="#000000" /></label>
+                  <label class="field"><span>หนา</span><input id="textStrokeWidthInput" type="number" min="0" max="10" step="0.5" value="0" /></label>
+                </div>
+
+                <div class="field-row field-row--2col">
+                  <label class="field"><span>เงา</span><input id="textShadowColorInput" type="color" value="#000000" /></label>
+                  <label class="field"><span>เบลอ</span><input id="textShadowBlurInput" type="number" min="0" max="20" step="1" value="0" /></label>
+                </div>
+
+                <label class="field">
+                  <span>โน้ต</span><input id="notesInput" type="text" />
+                </label>
+              </section>
             </div>
           </div>
 
-          <div id="warningsBox" class="warnings-box hidden"></div>
-        </section>
-
-        <aside class="sidebar">
-          <section class="panel">
-            <div class="panel-head">
-              <h2>รายการข้อความ</h2>
-              <span id="regionCountPill" class="pill">0 กล่อง</span>
+          <!-- Region List (takes remaining space) -->
+          <div class="editor__section editor__regions">
+            <div class="editor__head">
+              <h3 class="editor__title">กล่องข้อความ <span id="regionCountPill" class="badge">0</span></h3>
             </div>
             <div id="regionList" class="region-list empty">ยังไม่มีข้อความที่ตรวจพบ</div>
-          </section>
+          </div>
 
-          <section class="panel inspector">
-            <div class="panel-head">
-              <h2>แก้ไขข้อความ</h2>
-              <button id="deleteRegionButton" class="text-button">ลบกล่อง</button>
-            </div>
-
-            <div id="emptyInspector" class="empty-inspector">เลือกกล่องข้อความจากภาพหรือจากรายการด้านบน</div>
-
-            <div id="inspectorFields" class="inspector-fields hidden">
-              <label class="field">
-                <span>ประเภท</span>
-                <input id="kindInput" type="text" />
-              </label>
-
-              <label class="field">
-                <span>ต้นฉบับ</span>
-                <textarea id="sourceInput" rows="3" readonly></textarea>
-              </label>
-
-              <label class="field">
-                <span>คำแปลภาษาไทย</span>
-                <textarea id="translatedInput" rows="5"></textarea>
-              </label>
-
-              <div class="grid-two">
-                <label class="field">
-                  <span>X %</span>
-                  <input id="xInput" type="number" min="0" max="100" step="0.1" />
-                </label>
-                <label class="field">
-                  <span>Y %</span>
-                  <input id="yInput" type="number" min="0" max="100" step="0.1" />
-                </label>
-              </div>
-
-              <div class="grid-two">
-                <label class="field">
-                  <span>กว้าง %</span>
-                  <input id="widthInput" type="number" min="1" max="100" step="0.1" />
-                </label>
-                <label class="field">
-                  <span>สูง %</span>
-                  <input id="heightInput" type="number" min="1" max="100" step="0.1" />
-                </label>
-              </div>
-
-              <div class="grid-two">
-                <label class="field">
-                  <span>Font px</span>
-                  <input id="fontSizeInput" type="number" min="10" max="120" step="1" />
-                </label>
-                <label class="field">
-                  <span>จัดวาง</span>
-                  <select id="alignmentInput">
-                    <option value="left">left</option>
-                    <option value="center">center</option>
-                    <option value="right">right</option>
-                  </select>
-                </label>
-              </div>
-
-              <div class="grid-two">
-                <label class="field">
-                  <span>สีตัวอักษร</span>
-                  <input id="textColorInput" type="text" placeholder="#111111" />
-                </label>
-                <label class="field">
-                  <span>สีพื้นหลัง</span>
-                  <input id="backgroundColorInput" type="text" placeholder="rgba(255,255,255,0.92)" />
-                </label>
-              </div>
-
-              <label class="field">
-                <span>โน้ต</span>
-                <input id="notesInput" type="text" />
-              </label>
-            </div>
-          </section>
+          <!-- User note (collapsed into bottom bar) -->
+          <div class="editor__note-bar">
+            <input id="userNoteInput" type="text" class="editor__note-input" placeholder="โน้ตหน้านี้..." />
+          </div>
         </aside>
       </main>
+
+      <!-- ═══ PREVIEW MODAL ═══ -->
+      <div id="previewModal" class="preview-modal hidden">
+        <div class="preview-modal__backdrop"></div>
+        <div class="preview-modal__content">
+          <div class="preview-modal__head">
+            <h3>ดูตัวอย่างก่อนส่งออก</h3>
+            <div class="preview-modal__actions">
+              <button id="editModeButton" class="btn btn--ghost" data-tip="ระบายแก้ไขด้วย AI" data-tip-pos="bottom">โหมดแก้ภาพ</button>
+              <button id="previewExportButton" class="btn btn--primary" data-tip="บันทึกไฟล์ส่งออก" data-tip-pos="bottom">ส่งออก</button>
+              <button id="previewCloseButton" class="btn btn--ghost" data-tip="ปิดพรีวิว" data-tip-pos="bottom">ปิด</button>
+            </div>
+          </div>
+          <div class="preview-modal__body">
+            <!-- Compare view (default) -->
+            <div id="previewCompare" class="preview-compare">
+              <!-- Before (original) -->
+              <img id="previewBefore" class="preview-compare__img" alt="ภาพก่อนแปล" draggable="false" />
+              <!-- After (translated) — clipped by slider -->
+              <img id="previewAfter" class="preview-compare__img preview-compare__after" alt="ภาพหลังแปล" draggable="false" />
+              <!-- Slider divider -->
+              <div id="previewSlider" class="preview-compare__slider">
+                <div class="preview-compare__handle">
+                  <span class="preview-compare__arrow">◀</span>
+                  <span class="preview-compare__arrow">▶</span>
+                </div>
+              </div>
+              <!-- Labels -->
+              <span class="preview-compare__label preview-compare__label--before">ต้นฉบับ</span>
+              <span class="preview-compare__label preview-compare__label--after">แปลแล้ว</span>
+            </div>
+            <!-- Edit mode view -->
+            <div id="editModePanel" class="edit-mode hidden">
+              <div class="edit-mode__canvas-wrap">
+                <canvas id="editCanvas"></canvas>
+                <!-- Loading overlay during Gemini edit -->
+                <div id="editLoadingOverlay" class="edit-mode__loading hidden">
+                  <div class="edit-mode__loading-ring"></div>
+                  <span id="editLoadingLabel" class="edit-mode__loading-text">กำลังส่งให้ Gemini...</span>
+                </div>
+                <!-- Before/After compare after edit -->
+                <div id="editCompare" class="edit-mode__compare hidden">
+                  <img id="editCompareBefore" class="edit-mode__compare-img" alt="ภาพก่อนแก้" draggable="false" />
+                  <img id="editCompareAfter" class="edit-mode__compare-img edit-mode__compare-after" alt="ภาพหลังแก้" draggable="false" />
+                  <div id="editCompareSlider" class="preview-compare__slider">
+                    <div class="preview-compare__handle">
+                      <span class="preview-compare__arrow">◀</span>
+                      <span class="preview-compare__arrow">▶</span>
+                    </div>
+                  </div>
+                  <span class="preview-compare__label preview-compare__label--before">ก่อนแก้</span>
+                  <span class="preview-compare__label preview-compare__label--after">หลังแก้</span>
+                </div>
+              </div>
+              <div class="edit-mode__toolbar">
+                <div class="edit-mode__brush-controls">
+                  <label data-tip="ปรับขนาดแปรงระบาย" data-tip-pos="bottom">แปรง
+                    <input id="editBrushSize" type="range" min="5" max="80" value="20" />
+                    <span id="editBrushSizeLabel">20px</span>
+                  </label>
+                  <button id="editUndoStroke" class="btn btn--ghost btn--sm" data-tip="ย้อนกลับ" data-tip-pos="bottom">ย้อนกลับ</button>
+                <button id="editClearBrush" class="btn btn--ghost btn--sm" data-tip="ลบทั้งหมด" data-tip-pos="bottom">ล้างทั้งหมด</button>
+                </div>
+                <div class="edit-mode__prompt-row">
+                  <input id="editPromptInput" type="text" class="edit-mode__prompt"
+                    placeholder="อธิบายสิ่งที่อยากแก้ไข เช่น ลบข้อความที่เหลือออก แล้วเติมพื้นหลังให้เรียบ"
+                    data-tip="สั่ง Gemini แก้ไข" data-tip-pos="bottom" />
+                  <button id="editSendButton" class="btn btn--primary" data-tip="ส่งให้ AI แก้ไข" data-tip-pos="bottom">ส่งให้ Gemini แก้ไข</button>
+                </div>
+                <div id="editStatus" class="edit-mode__status"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ TRANSLATION MODE MODAL ═══ -->
+      <div id="translationModeModal" class="translation-mode-modal hidden" aria-hidden="true">
+        <div class="translation-mode-modal__backdrop"></div>
+        <div class="translation-mode-modal__content" role="dialog" aria-modal="true" aria-labelledby="translationModeTitle">
+          <div class="translation-mode-modal__head">
+            <div>
+              <p class="translation-mode-modal__eyebrow">Translation Mode</p>
+              <h3 id="translationModeTitle">เลือกโหมดการแปล</h3>
+            </div>
+            <button id="translationModeCloseButton" class="btn btn--icon btn--ghost" type="button" aria-label="ปิด">×</button>
+          </div>
+
+          <div class="translation-mode-modal__body">
+            <label class="translation-choice">
+              <input type="radio" name="translationMode" value="all" checked />
+              <div class="translation-choice__panel">
+                <span class="translation-choice__title">แปลทุกหน้า</span>
+                <span class="translation-choice__desc">เหมาะสำหรับงานยกเล่มหรือแปลทั้งไฟล์ PDF / comic set</span>
+              </div>
+            </label>
+
+            <label class="translation-choice">
+              <input type="radio" name="translationMode" value="current" />
+              <div class="translation-choice__panel">
+                <span class="translation-choice__title">แปลหน้าที่เปิดอยู่</span>
+                <span class="translation-choice__desc">แปลเฉพาะหน้าปัจจุบันที่กำลังเปิดบน canvas</span>
+              </div>
+            </label>
+
+            <label class="translation-choice">
+              <input type="radio" name="translationMode" value="selected" />
+              <div class="translation-choice__panel">
+                <span class="translation-choice__title">แปลเลขหน้าที่ระบุ</span>
+                <span class="translation-choice__desc">พิมพ์เลขหน้าคั่นด้วยเครื่องหมายจุลภาค เช่น <code>1,3,4</code></span>
+                <input id="translationPagesInput" class="translation-mode-modal__input" type="text" inputmode="numeric" placeholder="เช่น 1,3,4" />
+              </div>
+            </label>
+          </div>
+
+          <div class="translation-mode-modal__foot">
+            <p class="translation-mode-modal__note">ระบบจะส่งงานตามโหมดที่เลือก แล้วค่อยให้คุณแก้กล่องข้อความต่อใน editor</p>
+            <div class="translation-mode-modal__actions">
+              <button id="translationModeCancelButton" class="btn btn--ghost" type="button">ยกเลิก</button>
+              <button id="translationModeConfirmButton" class="btn btn--primary" type="button">เริ่มแปล</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ HISTORY / CACHE DRAWER ═══ -->
+      <aside id="historyCacheDrawer" class="history-cache-drawer hidden" aria-hidden="true">
+        <div class="history-cache-drawer__backdrop"></div>
+        <div class="history-cache-drawer__panel" role="dialog" aria-modal="true" aria-labelledby="historyCacheTitle">
+          <div class="history-cache-drawer__head">
+            <div>
+              <p class="history-cache-drawer__eyebrow">Project Activity</p>
+              <h3 id="historyCacheTitle">History และ Cache</h3>
+            </div>
+            <button id="historyCacheCloseButton" class="btn btn--icon btn--ghost" type="button" aria-label="ปิด">×</button>
+          </div>
+
+          <div class="history-cache-drawer__summary">
+            <div class="history-stat">
+              <span class="history-stat__label">Action history</span>
+              <strong class="history-stat__value" id="historyActionCount">0</strong>
+              <span class="history-stat__hint">บันทึกทุกการแก้ไข, translate, undo, redo, export</span>
+            </div>
+            <div class="history-stat">
+              <span class="history-stat__label">Cache usage</span>
+              <strong class="history-stat__value" id="historyCacheSize">0 MB</strong>
+              <span class="history-stat__hint">รูป preview, clean image, page render และ project snapshot</span>
+            </div>
+          </div>
+
+          <div class="history-cache-drawer__sections">
+            <section class="history-panel">
+              <div class="history-panel__head">
+                <h4>Action history</h4>
+                <span class="badge" id="historyScopeBadge">Current project</span>
+              </div>
+              <div id="historyActionList" class="history-list">
+                <article class="history-item">
+                  <span class="history-item__time">Now</span>
+                  <div class="history-item__body">
+                    <strong>Ready</strong>
+                    <p>รายการที่ขึ้น Restore จะกดย้อนกลับได้ทันที ส่วน Log only จะเป็นบันทึกไว้ตรวจสอบการเปลี่ยนแปลงย้อนหลัง</p>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="history-panel">
+              <div class="history-panel__head">
+                <h4>Cache summary</h4>
+                <span class="badge badge--accent" id="historyCacheItems">0 items</span>
+              </div>
+              <div class="history-cache-grid">
+                <div class="history-metric">
+                  <span class="history-metric__label">Page renders</span>
+                  <strong class="history-metric__value" id="historyRenderedPages">0</strong>
+                </div>
+                <div class="history-metric">
+                  <span class="history-metric__label">Project snapshots</span>
+                  <strong class="history-metric__value" id="historySnapshots">0</strong>
+                </div>
+                <div class="history-metric">
+                  <span class="history-metric__label">Recent files</span>
+                  <strong class="history-metric__value" id="historyRecentCount">0</strong>
+                </div>
+                <div class="history-metric">
+                  <span class="history-metric__label">Last cache sync</span>
+                  <strong class="history-metric__value" id="historyLastSync">-</strong>
+                </div>
+              </div>
+              <p class="history-cache-drawer__footnote">ระบบจะเก็บ snapshot สำหรับ action สำคัญเพื่อย้อนกลับงานได้ และยังบันทึก cache/meta ต่อหน้าไว้ช่วยตรวจสอบว่าไฟล์ไหนถูกแปล แก้ ลบข้อความ หรือส่งออกไปแล้วบ้าง</p>
+            </section>
+          </div>
+        </div>
+      </aside>
+
+      <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="false"></div>
+
+      <!-- Close confirmation dialog -->
+      <div id="closeDialog" class="close-dialog hidden">
+        <div class="close-dialog__backdrop"></div>
+        <div class="close-dialog__box">
+          <div class="close-dialog__icon">💾</div>
+          <h3 class="close-dialog__title">บันทึกโปรเจคก่อนออก?</h3>
+          <p class="close-dialog__message">คุณมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก</p>
+          <div class="close-dialog__buttons">
+            <button id="closeSaveBtn" class="btn btn--primary">บันทึก</button>
+            <button id="closeDiscardBtn" class="btn btn--danger">ไม่บันทึก</button>
+            <button id="closeCancelBtn" class="btn">ยกเลิก</button>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <script src="../node_modules/ag-psd/dist/bundle.js"></script>
     <script src="./renderer.js"></script>
   </body>
 </html>

@@ -1,0 +1,2032 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>คู่มือการใช้งาน — Manga Translate Studio</title>
+  <style>
+    /* Bundled Thai fonts for live preview */
+    @font-face { font-family: "Kanit"; src: url("./fonts/Kanit-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Kanit"; src: url("./fonts/Kanit-Bold.ttf"); font-weight: 700; font-display: swap; }
+    @font-face { font-family: "Sarabun"; src: url("./fonts/Sarabun-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Prompt"; src: url("./fonts/Prompt-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "K2D"; src: url("./fonts/K2D-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Itim"; src: url("./fonts/Itim-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Sriracha"; src: url("./fonts/Sriracha-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Mali"; src: url("./fonts/Mali-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Chonburi"; src: url("./fonts/Chonburi-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Pattaya"; src: url("./fonts/Pattaya-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Mitr"; src: url("./fonts/Mitr-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Noto Sans Thai"; src: url("./fonts/NotoSansThai-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Noto Serif Thai"; src: url("./fonts/NotoSerifThai-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Chakra Petch"; src: url("./fonts/ChakraPetch-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Kodchasan"; src: url("./fonts/Kodchasan-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Maitree"; src: url("./fonts/Maitree-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Pridi"; src: url("./fonts/Pridi-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Charm"; src: url("./fonts/Charm-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Athiti"; src: url("./fonts/Athiti-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Niramit"; src: url("./fonts/Niramit-Regular.ttf"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Charmonman"; src: url("./fonts/Charmonman-Regular.ttf"); font-weight: 400; font-display: swap; }
+
+    :root {
+      --bg: #101014;
+      --bg-raised: #18181e;
+      --surface: #1e1e26;
+      --surface-hover: #262630;
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.14);
+      --ink: #e4e2de;
+      --ink-muted: #8a8880;
+      --accent: #f0913a;
+      --accent-hover: #ff9f4e;
+      --accent-soft: rgba(240,145,58,0.14);
+      --accent-text: #ffb06e;
+      --success: #3ecf8e;
+      --danger: #ef6461;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --font: "Segoe UI", "Noto Sans Thai", system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+      scrollbar-width: none;            /* Firefox */
+    }
+    html::-webkit-scrollbar { display: none; }  /* Chrome/Edge */
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.7;
+      font-size: 15px;
+      overflow-x: hidden;
+    }
+
+    /* ─── Sidebar Nav ─── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 240px;
+      height: 100vh;
+      background: var(--bg-raised);
+      border-right: 1px solid var(--border-strong);
+      overflow-y: auto;
+      z-index: 100;
+      padding: 24px 0;
+    }
+    .sidebar__brand {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .sidebar__logo {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+    .sidebar__sub {
+      font-size: 11px;
+      color: var(--ink-muted);
+      margin-top: 2px;
+    }
+    .sidebar__nav {
+      list-style: none;
+    }
+    .sidebar__nav li a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 20px;
+      color: var(--ink-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.15s, color 0.15s, padding-left 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar__nav li a:hover {
+      background: var(--surface-hover);
+      color: var(--ink);
+      padding-left: 24px;
+    }
+    .sidebar__nav li a.active {
+      color: var(--accent-text);
+      border-left-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .sidebar__nav li a .nav-icon {
+      font-size: 16px;
+      width: 22px;
+      text-align: center;
+    }
+
+    /* ─── Main Content ─── */
+    .main {
+      margin-left: 240px;
+      padding: 40px 48px 80px;
+      max-width: 900px;
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      text-align: center;
+      padding: 48px 0 40px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+    .hero__title {
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), #ffb06e, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    .hero__desc {
+      font-size: 16px;
+      color: var(--ink-muted);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* ─── Sections ─── */
+    .section {
+      margin-bottom: 56px;
+      scroll-margin-top: 24px;
+    }
+    .section__header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .section__num {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .section__title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .section p {
+      margin-bottom: 12px;
+    }
+
+    /* ─── UI Mock Components ─── */
+    .ui-mock {
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin: 16px 0 20px;
+      position: relative;
+    }
+    .ui-mock__label {
+      position: absolute;
+      top: -10px; right: 16px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Buttons */
+    .mock-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: default;
+      white-space: nowrap;
+    }
+    .mock-btn--primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .mock-btn--secondary {
+      background: var(--accent-soft);
+      border-color: rgba(240,145,58,0.3);
+      color: var(--accent-text);
+    }
+    .mock-btn--ghost {
+      background: transparent;
+      border-color: transparent;
+    }
+    .mock-btn--danger {
+      background: rgba(239,100,97,0.14);
+      border-color: rgba(239,100,97,0.3);
+      color: var(--danger);
+    }
+    .mock-btn--xs { padding: 2px 8px; font-size: 11px; }
+    .mock-btn--sm { padding: 4px 10px; font-size: 12px; }
+
+    /* Topbar mock */
+    .mock-topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 10px 16px;
+      background: var(--bg-raised);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    .mock-topbar__brand {
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--accent);
+      margin-right: 8px;
+    }
+    .mock-topbar__model {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--accent-soft);
+      color: var(--accent-text);
+      font-family: monospace;
+    }
+    .mock-topbar__sep { flex: 1; }
+
+    /* Input mocks */
+    .mock-input {
+      padding: 6px 10px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--bg-raised);
+      color: var(--ink);
+      font-size: 13px;
+      width: 180px;
+    }
+    .mock-select {
+      padding: 5px 8px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--bg-raised);
+      color: var(--ink);
+      font-size: 13px;
+    }
+    .mock-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+    .mock-toggle input[type="checkbox"] {
+      accent-color: var(--accent);
+    }
+
+    /* Inspector mock */
+    .mock-inspector {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .mock-field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .mock-field__label {
+      font-size: 12px;
+      color: var(--ink-muted);
+      font-weight: 600;
+    }
+    .mock-field__row {
+      display: flex;
+      gap: 8px;
+    }
+    .mock-field__row .mock-input { flex: 1; width: auto; }
+
+    /* Region card mock */
+    .mock-region-card {
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .mock-region-card.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .mock-region-card__top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mock-kind-tag {
+      display: inline-flex;
+      padding: 1px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-text);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .mock-card-label {
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+    .mock-card-text {
+      font-size: 13px;
+    }
+
+    /* Slider mock */
+    .mock-slider {
+      position: relative;
+      height: 200px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+      display: flex;
+    }
+    .mock-slider__half {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+    .mock-slider__half--before { background: #1a1a22; }
+    .mock-slider__half--after { background: #1e1e2a; }
+    .mock-slider__divider {
+      width: 3px;
+      background: #fff;
+      position: relative;
+    }
+    .mock-slider__handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #333;
+      gap: 1px;
+    }
+    .mock-slider__label {
+      position: absolute;
+      top: 8px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .mock-slider__label--l { left: 8px; background: rgba(255,255,255,0.1); color: var(--ink-muted); }
+    .mock-slider__label--r { right: 8px; background: var(--accent-soft); color: var(--accent-text); }
+
+    /* Edit mode mock */
+    .mock-edit-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--bg-raised);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .mock-edit-toolbar__prompt {
+      flex: 1;
+      min-width: 200px;
+      padding: 7px 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--bg-raised);
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    /* Flow diagram */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 20px 0;
+    }
+    .flow__step {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .flow__line {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 40px;
+      flex-shrink: 0;
+    }
+    .flow__dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: #fff;
+      font-weight: 800;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 10px rgba(240,145,58,0.3);
+    }
+    .flow__connector {
+      width: 2px;
+      flex: 1;
+      min-height: 24px;
+      background: linear-gradient(180deg, var(--accent), rgba(240,145,58,0.1));
+    }
+    .flow__content {
+      padding: 4px 0 28px;
+      flex: 1;
+    }
+    .flow__content h4 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .flow__content p {
+      font-size: 13px;
+      color: var(--ink-muted);
+      margin: 0;
+    }
+
+    /* Keyboard shortcut table */
+    .kbd-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+    .kbd-table th {
+      text-align: left;
+      font-size: 12px;
+      color: var(--ink-muted);
+      font-weight: 600;
+      padding: 8px 12px;
+      border-bottom: 2px solid var(--border-strong);
+    }
+    .kbd-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    kbd {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      font-family: monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-text);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    /* Callout */
+    .callout {
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      border-left: 4px solid;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .callout--tip { border-color: var(--accent); background: var(--accent-soft); }
+    .callout--info { border-color: #63b3ed; background: rgba(99,179,237,0.1); }
+    .callout--warn { border-color: #ecc94b; background: rgba(236,201,75,0.1); }
+    .callout__title {
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    /* Arrow annotation */
+    .annotate {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      background: var(--accent-soft);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-text);
+    }
+
+    /* ─── Real Compare Slider ─── */
+    .real-compare {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+      cursor: col-resize;
+      user-select: none;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+    .real-compare img {
+      display: block;
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+    }
+    .real-compare__after {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      clip-path: inset(0 0 0 50%);
+    }
+    .real-compare__after img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .real-compare__slider {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%;
+      width: 3px;
+      background: #fff;
+      transform: translateX(-50%);
+      z-index: 10;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+    .real-compare__handle {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 11px;
+      color: #333;
+      transition: transform 0.15s;
+    }
+    .real-compare__handle:hover {
+      transform: translate(-50%, -50%) scale(1.15);
+      box-shadow: 0 3px 16px rgba(240,145,58,0.4);
+    }
+    .real-compare__label {
+      position: absolute;
+      top: 12px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .real-compare__label--before {
+      left: 12px;
+      background: rgba(0,0,0,0.5);
+      color: #ccc;
+    }
+    .real-compare__label--after {
+      right: 12px;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* ─── Scroll Progress Bar ─── */
+    .scroll-progress {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      z-index: 9999;
+      background: transparent;
+    }
+    .scroll-progress__fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), #ffb06e, var(--accent));
+      transition: width 0.1s linear;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 0 0 8px rgba(240,145,58,0.5);
+    }
+
+    /* ─── Back to Top ─── */
+    .back-to-top {
+      position: fixed;
+      bottom: 28px; right: 28px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(240,145,58,0.4);
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(20px) scale(0.8);
+      transition: opacity 0.3s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none;
+    }
+    .back-to-top.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .back-to-top:hover {
+      transform: translateY(-2px) scale(1.1);
+      box-shadow: 0 6px 20px rgba(240,145,58,0.5);
+    }
+
+    /* ─── Scroll Reveal Animation ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Reading Progress Checkmarks on Sidebar ─── */
+    .sidebar__nav li a .nav-check {
+      margin-left: auto;
+      font-size: 12px;
+      opacity: 0;
+      transform: scale(0);
+      transition: opacity 0.3s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      color: var(--success);
+    }
+    .sidebar__nav li a .nav-check.read {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ─── Keyboard Shortcut Interactive ─── */
+    .kbd-table tr {
+      transition: background 0.15s;
+    }
+    .kbd-table tr:hover td {
+      background: var(--surface-hover);
+    }
+    .kbd-table tr.flash td {
+      background: var(--accent-soft) !important;
+    }
+    .kbd-table tr.flash kbd {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      transform: scale(1.1);
+      transition: transform 0.15s;
+    }
+
+    /* ─── Theme Toggle in Guide ─── */
+    .guide-theme-toggle {
+      position: fixed;
+      bottom: 28px; right: 80px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-strong);
+      font-size: 18px;
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      transition: background 0.2s, transform 0.2s;
+    }
+    .guide-theme-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    /* Light theme for guide */
+    body.light {
+      --bg: #f0ece6;
+      --bg-raised: #f8f5f0;
+      --surface: #ffffff;
+      --surface-hover: #f5f2ed;
+      --border: rgba(0,0,0,0.08);
+      --border-strong: rgba(0,0,0,0.14);
+      --ink: #1a1816;
+      --ink-muted: #7a756e;
+      --accent: #d86e1a;
+      --accent-hover: #c25e10;
+      --accent-soft: rgba(216,110,26,0.1);
+      --accent-text: #b85a14;
+      --success: #1a8a5a;
+      --danger: #c0392b;
+    }
+
+    /* ─── Tooltip on mock buttons ─── */
+    .mock-btn[data-info] {
+      position: relative;
+      cursor: help;
+    }
+    .mock-btn[data-info]:hover::after {
+      content: attr(data-info);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: #1c1c24;
+      color: #eee;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      animation: tooltipIn 0.2s ease;
+    }
+    @keyframes tooltipIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ─── Confetti ─── */
+    .confetti-piece {
+      position: fixed;
+      width: 8px; height: 8px;
+      border-radius: 2px;
+      z-index: 99999;
+      pointer-events: none;
+      animation: confettiFall 2.5s ease-out forwards;
+    }
+    @keyframes confettiFall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg) scale(0.3); }
+    }
+
+    /* ─── Section counter in reading ─── */
+    .reading-counter {
+      position: fixed;
+      bottom: 28px; left: 260px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      font-size: 12px;
+      color: var(--ink-muted);
+      z-index: 999;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transition: opacity 0.3s;
+    }
+    .reading-counter span {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 24px 20px 60px; }
+      .reading-counter { left: 20px; }
+    }
+
+    /* ═══ SVG Animated Icons ═══ */
+    .svg-icon {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .svg-icon path, .svg-icon circle, .svg-icon rect, .svg-icon polyline {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: svgDraw 1.2s ease forwards;
+    }
+    .reveal:not(.visible) .svg-icon path,
+    .reveal:not(.visible) .svg-icon circle,
+    .reveal:not(.visible) .svg-icon rect,
+    .reveal:not(.visible) .svg-icon polyline {
+      animation: none;
+      stroke-dashoffset: 100;
+    }
+    @keyframes svgDraw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* ═══ Canvas Particle Hero ═══ */
+    .hero {
+      position: relative;
+      overflow: hidden;
+    }
+    .hero__particles {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .hero__title, .hero__desc { position: relative; z-index: 1; }
+
+    /* Full-page particle background */
+    .bg-particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .sidebar { z-index: 100; }
+    .main { position: relative; z-index: 1; }
+    .back-to-top, .guide-theme-toggle, .reading-counter { z-index: 999; }
+
+    /* ═══ CSS @property — Animated Gradient ═══ */
+    @property --grad-angle {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 0deg;
+    }
+    .hero__title {
+      background: linear-gradient(var(--grad-angle), var(--accent), #ffb06e, #f6c343, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 300% 300%;
+      animation: gradientSpin 4s linear infinite, gradientShift 3s ease infinite;
+    }
+    @keyframes gradientSpin {
+      to { --grad-angle: 360deg; }
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* ═══ Interactive Canvas Demo ═══ */
+    .canvas-demo {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+    }
+    .canvas-demo canvas {
+      display: block;
+      width: 100%;
+      cursor: crosshair;
+      background: var(--surface);
+      border-radius: var(--radius);
+    }
+    .canvas-demo__hint {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.5);
+      color: #eee;
+      font-size: 13px;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    .canvas-demo__hint.hidden { opacity: 0; }
+    .canvas-demo__tools {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--bg-raised);
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+    .canvas-demo__tools input[type="range"] { width: 90px; accent-color: var(--accent); }
+    .canvas-demo__tools .mock-btn { cursor: pointer; }
+
+    /* ═══ SVG Workflow Connector ═══ */
+    .flow-svg-wrap {
+      margin: 20px 0 30px;
+      position: relative;
+    }
+    .flow-svg-wrap svg { display: block; width: 100%; }
+    .flow-svg-line {
+      stroke: var(--accent);
+      stroke-width: 2;
+      fill: none;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+    }
+    .reveal.visible .flow-svg-line {
+      animation: flowLineDraw 2s ease forwards;
+    }
+    @keyframes flowLineDraw {
+      to { stroke-dashoffset: 0; }
+    }
+    .flow-svg-dot {
+      fill: var(--accent);
+      opacity: 0;
+      transform-origin: center;
+    }
+    .reveal.visible .flow-svg-dot {
+      animation: flowDotPop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    .reveal.visible .flow-svg-dot:nth-child(2) { animation-delay: 0.4s; }
+    .reveal.visible .flow-svg-dot:nth-child(3) { animation-delay: 0.8s; }
+    .reveal.visible .flow-svg-dot:nth-child(4) { animation-delay: 1.2s; }
+    .reveal.visible .flow-svg-dot:nth-child(5) { animation-delay: 1.6s; }
+    @keyframes flowDotPop {
+      from { opacity: 0; r: 0; }
+      to { opacity: 1; r: 16; }
+    }
+    .flow-svg-label {
+      font-size: 11px;
+      fill: var(--ink);
+      text-anchor: middle;
+      font-weight: 700;
+      opacity: 0;
+    }
+    .reveal.visible .flow-svg-label {
+      animation: flowLabelFade 0.5s ease forwards;
+    }
+    .reveal.visible .flow-svg-label:nth-of-type(1) { animation-delay: 0.5s; }
+    .reveal.visible .flow-svg-label:nth-of-type(2) { animation-delay: 0.9s; }
+    .reveal.visible .flow-svg-label:nth-of-type(3) { animation-delay: 1.3s; }
+    .reveal.visible .flow-svg-label:nth-of-type(4) { animation-delay: 1.7s; }
+    .reveal.visible .flow-svg-label:nth-of-type(5) { animation-delay: 2.1s; }
+    @keyframes flowLabelFade {
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Full-page Particle Background -->
+  <canvas class="bg-particles" id="bgParticles"></canvas>
+
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress"><div class="scroll-progress__fill" id="scrollFill"></div></div>
+
+  <!-- Back to Top -->
+  <button class="back-to-top" id="backToTop" title="กลับด้านบน">↑</button>
+
+  <!-- Theme Toggle -->
+  <button class="guide-theme-toggle" id="guideThemeToggle" title="สลับธีม">🌙</button>
+
+  <!-- Reading Counter -->
+  <div class="reading-counter" id="readingCounter">อ่านแล้ว <span id="readCount">0</span> / <span id="totalSections">11</span> หัวข้อ</div>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__logo">MTS</div>
+      <div class="sidebar__sub">Manga Translate Studio</div>
+    </div>
+    <ul class="sidebar__nav">
+      <li><a href="#overview"><span class="nav-icon">1</span> ภาพรวม<span class="nav-check">✓</span></a></li>
+      <li><a href="#open-file"><span class="nav-icon">2</span> เปิดไฟล์<span class="nav-check">✓</span></a></li>
+      <li><a href="#translate"><span class="nav-icon">3</span> แปลเป็นไทย<span class="nav-check">✓</span></a></li>
+      <li><a href="#edit-text"><span class="nav-icon">4</span> แก้ไขข้อความ<span class="nav-check">✓</span></a></li>
+      <li><a href="#font-picker"><span class="nav-icon">5</span> เลือกฟอนต์<span class="nav-check">✓</span></a></li>
+      <li><a href="#clean-preview"><span class="nav-icon">6</span> Clean Preview<span class="nav-check">✓</span></a></li>
+      <li><a href="#preview"><span class="nav-icon">7</span> Preview<span class="nav-check">✓</span></a></li>
+      <li><a href="#edit-mode"><span class="nav-icon">8</span> Edit Mode<span class="nav-check">✓</span></a></li>
+      <li><a href="#export"><span class="nav-icon">9</span> Export<span class="nav-check">✓</span></a></li>
+      <li><a href="#pdf"><span class="nav-icon">10</span> PDF<span class="nav-check">✓</span></a></li>
+      <li><a href="#shortcuts"><span class="nav-icon">⌨</span> ปุ่มลัด<span class="nav-check">✓</span></a></li>
+    </ul>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <!-- Hero -->
+    <div class="hero">
+      <canvas class="hero__particles" id="heroParticles"></canvas>
+      <h1 class="hero__title">คู่มือการใช้งาน</h1>
+      <p class="hero__desc">แปลมังงะจากภาษาญี่ปุ่นเป็นภาษาไทยอัตโนมัติด้วย Gemini AI</p>
+    </div>
+
+    <!-- 1. Overview -->
+    <div id="overview" class="section reveal">
+      <div class="section__header">
+        <div class="section__num">1</div>
+        <h2 class="section__title">ภาพรวมหน้าจอ</h2>
+      </div>
+      <p>หน้าจอหลักประกอบด้วย 3 ส่วน: แถบเครื่องมือด้านบน, พื้นที่ทำงานตรงกลาง, และแผงแก้ไขด้านขวา</p>
+
+      <!-- Topbar mock -->
+      <div class="ui-mock">
+        <span class="ui-mock__label">แถบเครื่องมือ</span>
+        <div class="mock-topbar">
+          <span class="mock-topbar__brand">MTS</span>
+          <span class="mock-topbar__model">gemini-3-pro-image-preview</span>
+          <span class="mock-topbar__sep"></span>
+          <span class="mock-btn mock-btn--secondary" data-info="เปิดโปรเจค, ภาพ, หรือ PDF (Ctrl+O)">เปิดไฟล์</span>
+          <span class="mock-btn mock-btn--ghost" data-info="บันทึกโปรเจค (Ctrl+S)">Save</span>
+          <span class="mock-btn mock-btn--ghost mock-btn--xs" data-info="เลิกทำ (Ctrl+Z)">↩</span>
+          <span class="mock-btn mock-btn--ghost mock-btn--xs" data-info="ทำซ้ำ (Ctrl+Y)">↪</span>
+          <span class="mock-btn mock-btn--primary" data-info="ส่งภาพให้ Gemini AI แปลเป็นไทย">แปลเป็นไทย</span>
+          <span class="mock-btn mock-btn--ghost" data-info="เพิ่มกล่องข้อความใหม่">+ กล่อง</span>
+          <span class="mock-btn mock-btn--ghost" data-info="ดูตัวอย่างก่อน-หลังแปล">👁 Preview</span>
+          <span class="mock-btn mock-btn--ghost" data-info="Export เป็น PNG หรือ PDF">Export</span>
+          <span class="mock-topbar__sep"></span>
+          <input class="mock-input" type="text" value="••••••••••" disabled style="width:140px; font-size:11px;" />
+          <label class="mock-toggle"><input type="checkbox" checked disabled /> Clean</label>
+          <span class="mock-btn mock-btn--ghost mock-btn--xs">โหมดสว่าง</span>
+        </div>
+      </div>
+
+      <!-- SVG Animated Workflow -->
+      <div class="flow-svg-wrap">
+        <svg viewBox="0 0 700 80" xmlns="http://www.w3.org/2000/svg">
+          <!-- Connecting line -->
+          <path class="flow-svg-line" d="M 70 40 L 630 40" />
+          <!-- Dots -->
+          <circle class="flow-svg-dot" cx="70"  cy="40" r="0" />
+          <circle class="flow-svg-dot" cx="210" cy="40" r="0" />
+          <circle class="flow-svg-dot" cx="350" cy="40" r="0" />
+          <circle class="flow-svg-dot" cx="490" cy="40" r="0" />
+          <circle class="flow-svg-dot" cx="630" cy="40" r="0" />
+          <!-- Step numbers -->
+          <text x="70"  y="45" text-anchor="middle" fill="#fff" font-size="14" font-weight="800">1</text>
+          <text x="210" y="45" text-anchor="middle" fill="#fff" font-size="14" font-weight="800">2</text>
+          <text x="350" y="45" text-anchor="middle" fill="#fff" font-size="14" font-weight="800">3</text>
+          <text x="490" y="45" text-anchor="middle" fill="#fff" font-size="14" font-weight="800">4</text>
+          <text x="630" y="45" text-anchor="middle" fill="#fff" font-size="14" font-weight="800">5</text>
+          <!-- Labels below -->
+          <text class="flow-svg-label" x="70"  y="72">เปิดไฟล์</text>
+          <text class="flow-svg-label" x="210" y="72">แปลเป็นไทย</text>
+          <text class="flow-svg-label" x="350" y="72">แก้ไข</text>
+          <text class="flow-svg-label" x="490" y="72">Preview</text>
+          <text class="flow-svg-label" x="630" y="72">Export</text>
+          <!-- SVG Icons inside dots -->
+          <g transform="translate(58,28)" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round">
+            <path class="svg-icon" d="M4 2h8l4 4v10H4z" stroke-dasharray="50" stroke-dashoffset="50"><animate attributeName="stroke-dashoffset" from="50" to="0" dur="0.8s" begin="0.5s" fill="freeze"/></path>
+          </g>
+          <g transform="translate(200,28)" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round">
+            <path class="svg-icon" d="M2 8h6l2-4 2 8 2-4h6" stroke-dasharray="40" stroke-dashoffset="40"><animate attributeName="stroke-dashoffset" from="40" to="0" dur="0.8s" begin="0.9s" fill="freeze"/></path>
+          </g>
+          <g transform="translate(340,28)" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round">
+            <path class="svg-icon" d="M12 2L2 12l3 3 10-10z" stroke-dasharray="50" stroke-dashoffset="50"><animate attributeName="stroke-dashoffset" from="50" to="0" dur="0.8s" begin="1.3s" fill="freeze"/></path>
+          </g>
+          <g transform="translate(480,28)" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round">
+            <circle class="svg-icon" cx="8" cy="8" r="6" stroke-dasharray="40" stroke-dashoffset="40"><animate attributeName="stroke-dashoffset" from="40" to="0" dur="0.8s" begin="1.7s" fill="freeze"/></circle>
+          </g>
+          <g transform="translate(620,28)" stroke="#fff" fill="none" stroke-width="1.5" stroke-linecap="round">
+            <polyline class="svg-icon" points="4,8 7,12 14,4" stroke-dasharray="20" stroke-dashoffset="20"><animate attributeName="stroke-dashoffset" from="20" to="0" dur="0.6s" begin="2.1s" fill="freeze"/></polyline>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 2. Open File -->
+    <div id="open-file" class="section reveal">
+      <div class="section__header">
+        <div class="section__num">2</div>
+        <h2 class="section__title">เปิดไฟล์</h2>
+      </div>
+      <p>กดปุ่ม <span class="mock-btn mock-btn--secondary">เปิดไฟล์</span> หรือ <kbd>Ctrl+O</kbd> เพื่อเลือกไฟล์:</p>
+      <ul style="margin:12px 0 12px 20px;">
+        <li>ภาพ — <code>.png, .jpg, .jpeg, .webp, .gif, .bmp</code></li>
+        <li>PDF — เปิดแล้วเลือกหน้าที่ต้องการแปลจากแผงด้านซ้าย</li>
+        <li>โปรเจค — <code>.mtsproj</code> เพื่อเปิดงานที่บันทึกไว้</li>
+      </ul>
+      <div class="callout callout--tip">
+        <div class="callout__title">Recent Files</div>
+        เมื่อเปิดแอพขึ้นมา จะเห็นรายการไฟล์ล่าสุดที่เคยเปิด คลิกเพื่อเปิดได้เลย
+      </div>
+    </div>
+
+    <!-- 3. Translate -->
+    <div id="translate" class="section reveal">
+      <div class="section__header">
+        <div class="section__num">3</div>
+        <h2 class="section__title">แปลเป็นไทย</h2>
+      </div>
+      <p>ก่อนแปล ต้องมี <b>Gemini API Key</b> ก่อน ทำตามขั้นตอนนี้:</p>
+
+      <!-- Step-by-step API Key guide -->
+      <h4 style="color:var(--accent); margin:20px 0 12px;">วิธีรับ Gemini API Key (ฟรี)</h4>
+
+      <!-- Step 1 -->
+      <div class="ui-mock" style="margin-bottom:16px;">
+        <span class="ui-mock__label">ขั้นตอนที่ 1</span>
+        <p style="font-size:14px; margin-bottom:12px;"><b>เข้าเว็บไซต์ Google AI Studio</b></p>
+        <div style="display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--bg); border-radius:8px; border:1px solid var(--border);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          <span style="font-size:13px; color:var(--ink-muted);">เปิด Browser แล้วไปที่:</span>
+          <code style="padding:4px 12px; background:var(--surface); border:1px solid var(--border-strong); border-radius:4px; font-size:13px; color:var(--accent-text); font-weight:600;">aistudio.google.com/apikey</code>
+        </div>
+        <p style="font-size:13px; color:var(--ink-muted); margin-top:8px;">หรือค้นหา "Google AI Studio" ใน Google แล้วเข้าเว็บ</p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="ui-mock" style="margin-bottom:16px;">
+        <span class="ui-mock__label">ขั้นตอนที่ 2</span>
+        <p style="font-size:14px; margin-bottom:12px;"><b>Sign in ด้วย Google Account</b></p>
+        <div style="display:flex; align-items:center; gap:12px; padding:14px 20px; background:#fff; border-radius:8px; border:1px solid #ddd;">
+          <svg width="24" height="24" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          <div>
+            <div style="font-size:14px; color:#202124; font-weight:500;">Sign in with Google</div>
+            <div style="font-size:12px; color:#5f6368;">ใช้บัญชี Google ที่มีอยู่แล้ว (Gmail)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="ui-mock" style="margin-bottom:16px;">
+        <span class="ui-mock__label">ขั้นตอนที่ 3</span>
+        <p style="font-size:14px; margin-bottom:12px;"><b>กดปุ่ม "Create API Key"</b></p>
+        <div style="padding:16px; background:#1a1a2e; border-radius:8px; border:1px solid #333;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#4285F4"/>
+              <path d="M2 17l10 5 10-5" stroke="#4285F4" stroke-width="2" fill="none"/>
+              <path d="M2 12l10 5 10-5" stroke="#4285F4" stroke-width="2" fill="none"/>
+            </svg>
+            <span style="font-size:16px; color:#e8eaed; font-weight:500;">Google AI Studio</span>
+            <span style="font-size:12px; color:#9aa0a6; margin-left:auto;">API keys</span>
+          </div>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <button style="padding:8px 20px; background:#8ab4f8; color:#1a1a2e; border:none; border-radius:20px; font-size:14px; font-weight:600; cursor:default; display:flex; align-items:center; gap:6px;">
+              <span style="font-size:16px;">+</span> Create API key
+            </button>
+            <span style="font-size:12px; color:#9aa0a6;">← กดปุ่มนี้</span>
+          </div>
+          <div style="margin-top:16px; padding:12px; background:#2d2d44; border-radius:6px; border:1px solid #444;">
+            <div style="font-size:11px; color:#9aa0a6; margin-bottom:4px;">Your API key</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <code style="flex:1; padding:6px 10px; background:#1a1a2e; border:1px solid #555; border-radius:4px; font-size:13px; color:#8ab4f8; letter-spacing:0.5px;">AIzaSy••••••••••••••••••••••••••••k-k</code>
+              <button style="padding:5px 12px; background:#3c4043; color:#e8eaed; border:1px solid #555; border-radius:4px; font-size:12px; cursor:default;">Copy</button>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:13px; color:var(--ink-muted); margin-top:8px;">เลือก project หรือสร้างใหม่ → ระบบจะสร้าง API Key ให้ → กด <b>Copy</b></p>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="ui-mock" style="margin-bottom:16px;">
+        <span class="ui-mock__label">ขั้นตอนที่ 4</span>
+        <p style="font-size:14px; margin-bottom:12px;"><b>วาง API Key ในโปรแกรม MTS</b></p>
+        <div style="display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--bg); border-radius:8px; border:1px solid var(--border);">
+          <span style="font-size:13px; color:var(--ink-muted);">วาง Key ที่ช่อง:</span>
+          <input class="mock-input" type="text" value="AIzaSy••••••••••••••••••k-k" disabled style="width:220px; border-color:var(--accent);" />
+          <span style="font-size:13px; color:var(--ink-muted);">→ กด</span>
+          <span class="mock-btn mock-btn--primary">แปลเป็นไทย</span>
+        </div>
+      </div>
+
+      <div class="callout callout--warn">
+        <div class="callout__title">เก็บ API Key ให้ดี</div>
+        API Key เปรียบเสมือนรหัสผ่าน อย่าแชร์ให้คนอื่น ถ้าหลุดให้ลบ key เก่าแล้วสร้างใหม่ได้ที่หน้าเดิม
+      </div>
+
+      <div class="callout callout--info" style="margin-top:12px;">
+        <div class="callout__title">ใช้ฟรีหรือเสียเงิน?</div>
+        <b>ฟรี:</b> Google ให้โควต้าฟรีต่อวัน เพียงพอสำหรับใช้งานทั่วไป<br>
+        <b>เสียเงิน:</b> ถ้าต้องการใช้มากขึ้น เปิด Billing ใน Google Cloud Console แล้วเชื่อมกับ project เดียวกัน
+      </div>
+
+      <h4 style="color:var(--accent); margin:24px 0 12px;">หลังใส่ API Key แล้ว</h4>
+      <p>กดปุ่ม <span class="mock-btn mock-btn--primary">แปลเป็นไทย</span> AI จะทำงานโดยแสดง progress แบบ real-time:</p>
+      <div class="ui-mock">
+        <span class="ui-mock__label">ตัวอย่าง Progress</span>
+        <div style="text-align:center; padding:20px 0;">
+          <div style="font-size:32px; font-weight:800; color:var(--accent); margin-bottom:8px;">AI</div>
+          <div style="font-size:13px; color:var(--ink-muted); margin-bottom:12px;">Gemini กำลังวิเคราะห์ข้อความ... (8s)</div>
+          <div style="width:100%; height:6px; border-radius:3px; background:var(--bg); overflow:hidden;">
+            <div style="width:65%; height:100%; border-radius:3px; background:linear-gradient(90deg, var(--accent), var(--accent-hover));"></div>
+          </div>
+          <div style="margin-top:6px; font-size:13px; font-weight:700; color:var(--accent);">65%</div>
+        </div>
+      </div>
+      <div class="callout callout--info">
+        <div class="callout__title">ขั้นตอนที่ AI ทำ</div>
+        เตรียมภาพ → ส่งภาพให้ Gemini วิเคราะห์ → ตรวจจับตำแหน่งข้อความ → แปลภาษา → ลบข้อความเดิม (Clean) → แสดงผล
+      </div>
+    </div>
+
+    <!-- 4. Edit Text -->
+    <div id="edit-text" class="section reveal">
+      <div class="section__header">
+        <div class="section__num">4</div>
+        <h2 class="section__title">แก้ไขข้อความ</h2>
+      </div>
+      <p>หลังแปลเสร็จ จะปรากฏกล่องข้อความบนภาพ คลิกเพื่อเลือกแล้วแก้ไขได้ที่แผงขวา:</p>
+
+      <!-- Region list mock -->
+      <div class="ui-mock">
+        <span class="ui-mock__label">รายการข้อความ</span>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div class="mock-region-card active">
+            <div class="mock-region-card__top"><span class="mock-kind-tag">dialogue</span><span class="mock-card-label">#1</span></div>
+            <div><span class="mock-card-label">ต้นฉบับ</span><p class="mock-card-text">ねーちゃん あぶない!!</p></div>
+            <div><span class="mock-card-label">คำแปลไทย</span><p class="mock-card-text">พี่คะ! ระวัง!!</p></div>
+          </div>
+          <div class="mock-region-card">
+            <div class="mock-region-card__top"><span class="mock-kind-tag">sfx</span><span class="mock-card-label">#2</span></div>
+            <div><span class="mock-card-label">ต้นฉบับ</span><p class="mock-card-text">あ!!</p></div>
+            <div><span class="mock-card-label">คำแปลไทย</span><p class="mock-card-text">อ้าาา!!</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inspector mock -->
+      <div class="ui-mock">
+        <span class="ui-mock__label">แผงแก้ไข</span>
+        <div class="mock-inspector">
+          <div class="mock-field">
+            <span class="mock-field__label">ประเภท</span>
+            <input class="mock-input" value="dialogue" disabled style="width:100%;" />
+          </div>
+          <div class="mock-field">
+            <span class="mock-field__label">ต้นฉบับ (อ่านอย่างเดียว)</span>
+            <input class="mock-input" value="ねーちゃん あぶない!!" disabled style="width:100%; opacity:0.6;" />
+          </div>
+          <div class="mock-field">
+            <span class="mock-field__label">คำแปลภาษาไทย</span>
+            <input class="mock-input" value="พี่คะ! ระวัง!!" disabled style="width:100%; border-color:var(--accent);" />
+          </div>
+          <div class="mock-field__row">
+            <div class="mock-field"><span class="mock-field__label">X%</span><input class="mock-input" value="65.0" disabled /></div>
+            <div class="mock-field"><span class="mock-field__label">Y%</span><input class="mock-input" value="8.0" disabled /></div>
+            <div class="mock-field"><span class="mock-field__label">W%</span><input class="mock-input" value="28.0" disabled /></div>
+            <div class="mock-field"><span class="mock-field__label">H%</span><input class="mock-input" value="15.0" disabled /></div>
+          </div>
+          <div class="mock-field__row">
+            <div class="mock-field"><span class="mock-field__label">ขนาด</span><select class="mock-select" disabled><option>28</option></select></div>
+            <div class="mock-field"><span class="mock-field__label">จัดวาง</span><select class="mock-select" disabled><option>C</option></select></div>
+            <div class="mock-field"><span class="mock-field__label">สี</span><input type="color" value="#111111" disabled style="width:36px;height:28px;border:1px solid var(--border-strong);border-radius:4px;" /></div>
+            <div class="mock-field"><span class="mock-field__label">พื้น</span><input class="mock-input" value="white" disabled style="width:80px;" /></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout--tip">
+        <div class="callout__title">ลากเลื่อนได้</div>
+        คลิกค้างที่กล่องข้อความบนภาพแล้วลากเพื่อเลื่อนตำแหน่ง หรือลากมุมขวาล่างเพื่อปรับขนาด
+      </div>
+
+      <p>กดปุ่ม <span class="mock-btn mock-btn--ghost">+ กล่อง</span> เพื่อเพิ่มกล่องข้อความใหม่ หรือ <span class="mock-btn mock-btn--danger mock-btn--xs">ลบกล่อง</span> เพื่อลบกล่องที่เลือก</p>
+    </div>
+
+    <!-- 5. Font Picker -->
+    <div id="font-picker" class="section reveal">
+      <div class="section__header">
+        <div class="section__num">5</div>
+        <h2 class="section__title">เลือกฟอนต์</h2>
+      </div>
+      <p>คลิกที่ dropdown ฟอนต์เพื่อเปิด Font Picker พร้อมระบบ Favorites — <b>ลองใช้งานจริงได้เลย!</b></p>
+
+      <!-- Interactive Font Picker + Preview -->
+      <div class="ui-mock" style="overflow:visible;">
+        <span class="ui-mock__label">ลองเลือกฟอนต์ได้เลย!</span>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+
+          <!-- Left: Font Picker -->
+          <div style="width:280px; flex-shrink:0;">
+            <!-- Trigger -->
+            <div id="gfpTrigger" style="padding:8px 12px; border:1px solid var(--border-strong); border-radius:6px; background:var(--bg-raised); display:flex; justify-content:space-between; align-items:center; cursor:pointer; transition:border-color 0.15s;" onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor=''">
+              <span id="gfpLabel" style="font-size:13px;">เลือกฟอนต์</span>
+              <span style="font-size:11px; color:var(--ink-muted);">▾</span>
+            </div>
+            <!-- Dropdown -->
+            <div id="gfpDropdown" style="margin-top:4px; border:1px solid var(--border-strong); border-radius:6px; background:var(--bg-raised); box-shadow:0 8px 24px rgba(0,0,0,0.35); display:none; overflow:hidden;">
+              <input type="text" id="gfpSearch" placeholder="ค้นหาฟอนต์..." style="width:100%; padding:8px 10px; border:none; border-bottom:1px solid var(--border); background:transparent; color:var(--ink); font-size:13px; outline:none;" />
+              <div id="gfpList" style="max-height:240px; overflow-y:auto;"></div>
+            </div>
+          </div>
+
+          <!-- Right: Live Preview -->
+          <div style="flex:1; min-width:250px;">
+            <div style="font-size:12px; color:var(--ink-muted); margin-bottom:8px; font-weight:600;">Live Preview</div>
+            <!-- Preview card -->
+            <div style="padding:16px 20px; background:var(--bg); border:1px solid var(--border-strong); border-radius:8px;">
+              <div id="gfpPreviewText" style="font-size:28px; color:var(--ink); line-height:1.5; transition:font-family 0.3s;">
+                สวัสดี! ยินดีต้อนรับ<br>
+                <span style="font-size:20px; opacity:0.7;">Manga Translate Studio</span>
+              </div>
+              <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                <div id="gfpPreviewBubble" style="display:inline-block; padding:8px 16px; background:#fff; border-radius:16px; color:#111; font-size:16px; transition:font-family 0.3s;">
+                  พี่คะ! ระวัง!!
+                </div>
+                <div id="gfpPreviewSfx" style="display:inline-block; padding:8px 16px; background:var(--accent-soft); border-radius:16px; color:var(--accent-text); font-size:22px; font-weight:700; transition:font-family 0.3s;">
+                  โอ้~~!
+                </div>
+              </div>
+            </div>
+            <!-- Font size slider -->
+            <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+              <span style="font-size:12px; color:var(--ink-muted);">ขนาด:</span>
+              <input type="range" id="gfpSizeSlider" min="14" max="48" value="28" style="flex:1; accent-color:var(--accent);" />
+              <span id="gfpSizeLabel" style="font-size:12px; color:var(--ink-muted); width:35px;">28px</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ul style="margin:16px 0 0 20px;">
+        <li>กด <span style="color:#f6c343;">☆</span> → เปลี่ยนเป็น <span style="color:#f6c343;">★</span> เพิ่มในรายการโปรด (อยู่บนสุดเสมอ)</li>
+        <li>พิมพ์ชื่อฟอนต์ในช่องค้นหาเพื่อ filter</li>
+        <li>ลาก slider <b>ขนาด</b> เพื่อปรับขนาด preview</li>
+        <li>Preview แสดงผลฟอนต์จริงทันที</li>
+      </ul>
+    </div>
+
+    <!-- 6. Clean Preview -->
+    <div id="clean-preview" class="section reveal">
+      <div class="section__header">
+        <div class="section__num">6</div>
+        <h2 class="section__title">Clean Preview</h2>
+      </div>
+      <p>เปิด toggle <label class="mock-toggle"><input type="checkbox" checked disabled /> Clean</label> ที่แถบด้านบนเพื่อให้ AI ลบข้อความต้นฉบับออกจากภาพก่อนวางข้อความไทยทับ</p>
+      <div class="callout callout--warn">
+        <div class="callout__title">Clean ทำงานอัตโนมัติ</div>
+        ขั้นตอน Clean จะทำพร้อมกับการแปล ไม่ต้องกดเพิ่ม แค่เปิด toggle ก่อนกดแปล
+      </div>
+    </div>
+
+    <!-- 7. Preview -->
+    <div id="preview" class="section reveal">
+      <div class="section__header">
+        <div class="section__num">7</div>
+        <h2 class="section__title">Preview (ดูตัวอย่าง)</h2>
+      </div>
+      <p>กดปุ่ม <span class="mock-btn mock-btn--ghost">👁 Preview</span> เพื่อดูผลลัพธ์ก่อน-หลังแปล:</p>
+
+      <div class="ui-mock" style="padding:0; overflow:hidden;">
+        <span class="ui-mock__label">ลองลาก slider ดูได้เลย!</span>
+        <div class="real-compare" id="guideCompare">
+          <!-- Before (original) -->
+          <img src="./guide_before.png" alt="ต้นฉบับ" draggable="false" />
+          <!-- After (translated) -->
+          <div class="real-compare__after" id="guideCompareAfter">
+            <img src="./guide_after.png" alt="แปลแล้ว" draggable="false" />
+          </div>
+          <!-- Slider -->
+          <div class="real-compare__slider" id="guideCompareSlider">
+            <div class="real-compare__handle">◀ ▶</div>
+          </div>
+          <!-- Labels -->
+          <span class="real-compare__label real-compare__label--before">ต้นฉบับ</span>
+          <span class="real-compare__label real-compare__label--after">แปลแล้ว</span>
+        </div>
+      </div>
+      <p style="margin-top:12px;">ลาก <b>slider ตรงกลาง</b> ไปซ้าย-ขวาเพื่อเปรียบเทียบภาพต้นฉบับกับภาพที่แปลแล้ว</p>
+
+      <div class="callout callout--tip">
+        <div class="callout__title">ลองเลย!</div>
+        Slider ด้านบนใช้งานได้จริง — ลากไปซ้ายเพื่อดูภาพที่แปลแล้ว ลากไปขวาเพื่อดูภาพต้นฉบับ
+      </div>
+    </div>
+
+    <!-- 8. Edit Mode -->
+    <div id="edit-mode" class="section reveal">
+      <div class="section__header">
+        <div class="section__num">8</div>
+        <h2 class="section__title">Edit Mode (แก้ไขด้วย AI)</h2>
+      </div>
+      <p>ในหน้า Preview กดปุ่ม <span class="mock-btn mock-btn--ghost">Edit Mode</span> เพื่อระบายจุดที่ต้องการแก้ไขเพิ่มเติม:</p>
+
+      <div class="ui-mock">
+        <span class="ui-mock__label">แถบเครื่องมือ Edit Mode</span>
+        <div class="mock-edit-toolbar">
+          <span style="font-size:13px; color:var(--ink-muted);">Brush:</span>
+          <input type="range" min="5" max="80" value="20" disabled style="width:100px; accent-color:var(--accent);" />
+          <span style="font-size:12px; color:var(--ink-muted);">20px</span>
+          <span class="mock-btn mock-btn--ghost mock-btn--sm">Undo</span>
+          <span class="mock-btn mock-btn--ghost mock-btn--sm">Clear</span>
+        </div>
+        <div class="mock-edit-toolbar" style="margin-top:8px;">
+          <input class="mock-edit-toolbar__prompt" value="ลบข้อความต้นฉบับที่เหลือออก แล้วเติมพื้นหลังให้เรียบ" disabled />
+          <span class="mock-btn mock-btn--primary">ส่งให้ Gemini แก้ไข</span>
+        </div>
+      </div>
+
+      <ol style="margin:16px 0 0 20px;">
+        <li><b>ระบายสีแดง</b> ทับบริเวณที่ต้องการแก้ไข (opacity 50%)</li>
+        <li><b>พิมพ์ prompt</b> บอก Gemini ว่าต้องการทำอะไร</li>
+        <li>กด <span class="mock-btn mock-btn--primary mock-btn--sm">ส่งให้ Gemini แก้ไข</span></li>
+        <li>รอ Gemini ประมวลผล → ดูผลก่อน-หลังด้วย slider</li>
+        <li>ถ้ายังไม่พอใจ ระบายเพิ่มแล้วส่งอีกรอบได้</li>
+      </ol>
+
+      <div class="callout callout--tip">
+        <div class="callout__title">Gemini เห็นสิ่งที่คุณระบาย</div>
+        ภาพที่ส่งไปจะมีรอยระบายสีแดงอยู่ Gemini จะเข้าใจว่าต้องแก้ไขตรงไหนจาก prompt + บริเวณที่ระบาย
+      </div>
+
+      <!-- Interactive Canvas Demo -->
+      <div class="ui-mock" style="padding:0; overflow:hidden;">
+        <span class="ui-mock__label">ลองระบายเลย!</span>
+        <div class="canvas-demo">
+          <canvas id="demoCanvas" width="700" height="260"></canvas>
+          <div class="canvas-demo__hint" id="demoHint">ลองลากเมาส์ระบายดูเลย!</div>
+          <div class="canvas-demo__tools">
+            <span>Brush:</span>
+            <input type="range" id="demoBrushSize" min="5" max="60" value="20" />
+            <span id="demoBrushLabel">20px</span>
+            <span class="mock-btn mock-btn--ghost mock-btn--sm" id="demoClear" style="cursor:pointer;">Clear</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Export -->
+    <div id="export" class="section reveal">
+      <div class="section__header">
+        <div class="section__num">9</div>
+        <h2 class="section__title">Export</h2>
+      </div>
+      <p>กดปุ่ม <span class="mock-btn mock-btn--ghost">Export</span> ที่แถบด้านบน หรือปุ่ม <span class="mock-btn mock-btn--primary mock-btn--sm">Export</span> ในหน้า Preview:</p>
+      <ul style="margin:12px 0 0 20px;">
+        <li><b>ภาพเดี่ยว</b> → บันทึกเป็น PNG</li>
+        <li><b>PDF หลายหน้า</b> → เลือกหน้าที่ต้องการ แล้ว Export เป็น PDF ไฟล์เดียว</li>
+      </ul>
+    </div>
+
+    <!-- 10. PDF -->
+    <div id="pdf" class="section reveal">
+      <div class="section__header">
+        <div class="section__num">10</div>
+        <h2 class="section__title">ทำงานกับ PDF</h2>
+      </div>
+      <p>เมื่อเปิดไฟล์ PDF จะแสดงแผง filmstrip ด้านซ้ายพร้อม thumbnail ทุกหน้า:</p>
+
+      <div class="ui-mock" style="display:flex; gap:10px; align-items:center;">
+        <span class="ui-mock__label">การนำทาง</span>
+        <span class="mock-btn mock-btn--ghost mock-btn--xs">▲</span>
+        <input class="mock-input" value="5" disabled style="width:50px; text-align:center;" />
+        <span class="mock-btn mock-btn--secondary mock-btn--xs">ไป</span>
+        <span class="mock-btn mock-btn--ghost mock-btn--xs">▼</span>
+      </div>
+
+      <ul style="margin:12px 0 0 20px;">
+        <li><b>คลิกหน้า</b> เพื่อเปิดหน้านั้นแปล</li>
+        <li><b>กดวงกลมมุมบนขวา</b> ของ thumbnail เพื่อเลือก/ยกเลิกหน้าสำหรับ Export</li>
+        <li>ใช้ปุ่ม ▲▼ หรือพิมพ์เลขหน้าแล้วกด <span class="mock-btn mock-btn--secondary mock-btn--xs">ไป</span></li>
+      </ul>
+    </div>
+
+    <!-- Shortcuts -->
+    <div id="shortcuts" class="section reveal">
+      <div class="section__header">
+        <div class="section__num" style="font-size:16px;">⌨</div>
+        <h2 class="section__title">ปุ่มลัด</h2>
+      </div>
+      <table class="kbd-table">
+        <thead><tr><th>ปุ่มลัด</th><th>การทำงาน</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Ctrl</kbd> + <kbd>O</kbd></td><td>เปิดไฟล์</td></tr>
+          <tr><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td>บันทึกโปรเจค</td></tr>
+          <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td><td>บันทึกเป็น...</td></tr>
+          <tr><td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td><td>เลิกทำ (Undo)</td></tr>
+          <tr><td><kbd>Ctrl</kbd> + <kbd>Y</kbd></td><td>ทำซ้ำ (Redo)</td></tr>
+          <tr><td><kbd>Ctrl</kbd> + <kbd>R</kbd></td><td>โหลดใหม่</td></tr>
+          <tr><td><kbd>Ctrl</kbd> + <kbd>+</kbd></td><td>ซูมเข้า</td></tr>
+          <tr><td><kbd>Ctrl</kbd> + <kbd>-</kbd></td><td>ซูมออก</td></tr>
+          <tr><td><kbd>Ctrl</kbd> + <kbd>0</kbd></td><td>ขนาดปกติ</td></tr>
+          <tr><td><kbd>F11</kbd></td><td>เต็มจอ</td></tr>
+          <tr><td><kbd>F12</kbd></td><td>เครื่องมือนักพัฒนา</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // ─── Sidebar active state + reading progress ───
+    const sections = document.querySelectorAll(".section[id]");
+    const navLinks = document.querySelectorAll(".sidebar__nav a");
+    const readSections = new Set();
+
+    const activeObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          // Highlight active nav
+          navLinks.forEach(link => link.classList.remove("active"));
+          const active = document.querySelector(`.sidebar__nav a[href="#${entry.target.id}"]`);
+          if (active) active.classList.add("active");
+
+          // Mark as read
+          readSections.add(entry.target.id);
+          const check = active?.querySelector(".nav-check");
+          if (check) check.classList.add("read");
+
+          // Update counter
+          document.getElementById("readCount").textContent = readSections.size;
+
+          // Confetti on reading all sections!
+          if (readSections.size === sections.length && !window._confettiDone) {
+            window._confettiDone = true;
+            launchConfetti();
+          }
+        }
+      }
+    }, { rootMargin: "-20% 0px -70% 0px" });
+    sections.forEach(sec => activeObserver.observe(sec));
+
+    // ─── Scroll Reveal Animation ───
+    const revealObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      }
+    }, { rootMargin: "0px 0px -60px 0px", threshold: 0.1 });
+    document.querySelectorAll(".reveal").forEach(el => revealObserver.observe(el));
+
+    // ─── Scroll Progress Bar ───
+    const scrollFill = document.getElementById("scrollFill");
+    window.addEventListener("scroll", () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      scrollFill.style.width = percent + "%";
+
+      // Back to top visibility
+      const btn = document.getElementById("backToTop");
+      if (scrollTop > 400) btn.classList.add("visible");
+      else btn.classList.remove("visible");
+    });
+
+    // ─── Back to Top ───
+    document.getElementById("backToTop").addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    // ─── Theme Toggle ───
+    const themeBtn = document.getElementById("guideThemeToggle");
+    themeBtn.addEventListener("click", () => {
+      document.body.classList.toggle("light");
+      themeBtn.textContent = document.body.classList.contains("light") ? "☀️" : "🌙";
+    });
+
+    // ─── Keyboard Shortcut Detection ───
+    const shortcutMap = {
+      "o": 0, "s": 1, "S": 2, "z": 3, "y": 4, "r": 5,
+      "=": 6, "+": 6, "-": 7, "0": 8,
+    };
+    const f11Row = 9;
+    const f12Row = 10;
+    document.addEventListener("keydown", (e) => {
+      const rows = document.querySelectorAll(".kbd-table tbody tr");
+      if (!rows.length) return;
+
+      let idx = -1;
+      if (e.key === "F11") idx = f11Row;
+      else if (e.key === "F12") idx = f12Row;
+      else if ((e.ctrlKey || e.metaKey) && shortcutMap[e.key] !== undefined) {
+        idx = shortcutMap[e.key];
+      }
+
+      if (idx >= 0 && idx < rows.length) {
+        e.preventDefault();
+        rows[idx].classList.add("flash");
+        setTimeout(() => rows[idx].classList.remove("flash"), 600);
+      }
+    });
+
+    // ─── Confetti ───
+    function launchConfetti() {
+      const colors = ["#f0913a", "#ffb06e", "#3ecf8e", "#63b3ed", "#ef6461", "#f6c343"];
+      for (let i = 0; i < 80; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti-piece";
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.top = -10 + "px";
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = (Math.random() * 1.5) + "s";
+        piece.style.animationDuration = (2 + Math.random() * 2) + "s";
+        piece.style.width = (5 + Math.random() * 8) + "px";
+        piece.style.height = (5 + Math.random() * 8) + "px";
+        piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 4500);
+      }
+    }
+
+    // ─── Full-page Particle Background ───
+    (function () {
+      const canvas = document.getElementById("bgParticles");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      let particles = [];
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: 1 + Math.random() * 2,
+          dx: (Math.random() - 0.5) * 0.4,
+          dy: (Math.random() - 0.5) * 0.4,
+          alpha: 0.15 + Math.random() * 0.35,
+          color: Math.random() > 0.5 ? "#f0913a" : "#ffb06e",
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const p of particles) {
+          p.x += p.dx;
+          p.y += p.dy;
+          if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.alpha;
+          ctx.fill();
+        }
+        ctx.globalAlpha = 0.06;
+        ctx.strokeStyle = "#f0913a";
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 100) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // ─── Canvas Particle Background (Hero) ───
+    (function () {
+      const canvas = document.getElementById("heroParticles");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      let particles = [];
+      let raf;
+
+      function resize() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      function createParticle() {
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: 1 + Math.random() * 2,
+          dx: (Math.random() - 0.5) * 0.4,
+          dy: (Math.random() - 0.5) * 0.4,
+          alpha: 0.15 + Math.random() * 0.35,
+          color: Math.random() > 0.5 ? "#f0913a" : "#ffb06e",
+        };
+      }
+
+      for (let i = 0; i < 50; i++) particles.push(createParticle());
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const p of particles) {
+          p.x += p.dx;
+          p.y += p.dy;
+          if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.alpha;
+          ctx.fill();
+        }
+        // Draw connecting lines between nearby particles
+        ctx.globalAlpha = 0.06;
+        ctx.strokeStyle = "#f0913a";
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 100) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        ctx.globalAlpha = 1;
+        raf = requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // ─── Interactive Brush Canvas Demo ───
+    (function () {
+      const canvas = document.getElementById("demoCanvas");
+      const hint = document.getElementById("demoHint");
+      const sizeSlider = document.getElementById("demoBrushSize");
+      const sizeLabel = document.getElementById("demoBrushLabel");
+      const clearBtn = document.getElementById("demoClear");
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d");
+      // Fill with a manga-like background
+      ctx.fillStyle = "#f0f0f0";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Draw some sample "text" lines to simulate manga
+      ctx.fillStyle = "#ccc";
+      ctx.font = "bold 48px serif";
+      ctx.fillText("こんにちは!", 200, 100);
+      ctx.font = "bold 32px serif";
+      ctx.fillText("ありがとう", 80, 200);
+      ctx.fillText("すごい!!", 420, 180);
+      const baseSnapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      let drawing = false;
+      let brushSize = 20;
+      let hintShown = true;
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+      }
+
+      function startDraw(e) {
+        drawing = true;
+        if (hintShown) { hint.classList.add("hidden"); hintShown = false; }
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+      }
+      function doDraw(e) {
+        if (!drawing) return;
+        const pos = getPos(e);
+        ctx.lineWidth = brushSize;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "rgba(255, 50, 50, 0.45)";
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+      }
+      function stopDraw() { drawing = false; }
+
+      canvas.addEventListener("pointerdown", startDraw);
+      canvas.addEventListener("pointermove", doDraw);
+      canvas.addEventListener("pointerup", stopDraw);
+      canvas.addEventListener("pointerleave", stopDraw);
+
+      sizeSlider.addEventListener("input", () => {
+        brushSize = Number(sizeSlider.value);
+        sizeLabel.textContent = brushSize + "px";
+      });
+
+      clearBtn.addEventListener("click", () => {
+        ctx.putImageData(baseSnapshot, 0, 0);
+      });
+    })();
+
+    // ─── Interactive Font Picker with Live Preview ───
+    (function () {
+      const FONTS = [
+        { label: "Kanit", value: "Kanit", cat: "sans" },
+        { label: "Sarabun", value: "Sarabun", cat: "sans" },
+        { label: "Prompt", value: "Prompt", cat: "sans" },
+        { label: "K2D", value: "K2D", cat: "sans" },
+        { label: "Noto Sans Thai", value: "Noto Sans Thai", cat: "sans" },
+        { label: "Chakra Petch", value: "Chakra Petch", cat: "sans" },
+        { label: "Athiti", value: "Athiti", cat: "sans" },
+        { label: "Kodchasan", value: "Kodchasan", cat: "sans" },
+        { label: "Mitr", value: "Mitr", cat: "sans" },
+        { label: "Niramit", value: "Niramit", cat: "sans" },
+        { label: "Itim (ลายมือ)", value: "Itim", cat: "hand" },
+        { label: "Sriracha (ลายมือ)", value: "Sriracha", cat: "hand" },
+        { label: "Mali (ลายมือ)", value: "Mali", cat: "hand" },
+        { label: "Charmonman (ลายมือ)", value: "Charmonman", cat: "hand" },
+        { label: "Chonburi (หนา/Display)", value: "Chonburi", cat: "display" },
+        { label: "Pattaya (Display)", value: "Pattaya", cat: "display" },
+        { label: "Noto Serif Thai", value: "Noto Serif Thai", cat: "serif" },
+        { label: "Charm", value: "Charm", cat: "serif" },
+        { label: "Maitree (Serif)", value: "Maitree", cat: "serif" },
+        { label: "Pridi (Serif)", value: "Pridi", cat: "serif" },
+      ];
+
+      const trigger = document.getElementById("gfpTrigger");
+      const label = document.getElementById("gfpLabel");
+      const dropdown = document.getElementById("gfpDropdown");
+      const search = document.getElementById("gfpSearch");
+      const list = document.getElementById("gfpList");
+      const preview = document.getElementById("gfpPreviewText");
+      const bubble = document.getElementById("gfpPreviewBubble");
+      const sfx = document.getElementById("gfpPreviewSfx");
+      const sizeSlider = document.getElementById("gfpSizeSlider");
+      const sizeLabel = document.getElementById("gfpSizeLabel");
+      if (!trigger) return;
+
+      let open = false;
+      let favs = new Set();
+      let selected = "";
+
+      function makeDivider(text, borderTop) {
+        const d = document.createElement("div");
+        d.style.cssText = "padding:4px 10px; font-size:11px; color:var(--ink-muted); background:var(--surface);" + (borderTop ? "border-top:1px solid var(--border);" : "");
+        d.textContent = text;
+        return d;
+      }
+      function makeCatLabel(text) {
+        const d = document.createElement("div");
+        d.style.cssText = "padding:3px 10px; font-size:10px; color:var(--ink-muted); opacity:0.6; text-transform:uppercase; letter-spacing:0.5px;";
+        d.textContent = text;
+        return d;
+      }
+
+      function buildList(filter) {
+        list.innerHTML = "";
+        const needle = (filter || "").toLowerCase();
+        const favItems = FONTS.filter(f => favs.has(f.value) && (!needle || f.label.toLowerCase().includes(needle)));
+        const rest = FONTS.filter(f => !favs.has(f.value) && (!needle || f.label.toLowerCase().includes(needle)));
+
+        if (favItems.length) {
+          list.appendChild(makeDivider("★ รายการโปรด", false));
+          favItems.forEach(f => list.appendChild(makeItem(f, true)));
+        }
+        if (rest.length) {
+          if (favItems.length) list.appendChild(makeDivider("ฟอนต์ทั้งหมด", true));
+          const catOrder = ["sans", "hand", "display", "serif"];
+          const catLabels = { sans: "Sans-Serif", hand: "ลายมือ", display: "Display/หนา", serif: "Serif" };
+          for (const cat of catOrder) {
+            const items = rest.filter(f => f.cat === cat);
+            if (!items.length) continue;
+            list.appendChild(makeCatLabel(catLabels[cat]));
+            items.forEach(f => list.appendChild(makeItem(f, false)));
+          }
+        }
+        if (!favItems.length && !rest.length) {
+          const empty = document.createElement("div");
+          empty.style.cssText = "padding:10px; font-size:12px; color:var(--ink-muted); text-align:center;";
+          empty.textContent = "ไม่พบฟอนต์";
+          list.appendChild(empty);
+        }
+      }
+
+      function makeItem(f, isFav) {
+        const item = document.createElement("div");
+        item.style.cssText = "display:flex; align-items:center; gap:8px; padding:7px 10px; cursor:pointer; transition:background 0.1s;";
+        if (f.value === selected) item.style.background = "rgba(99,179,237,0.15)";
+
+        item.addEventListener("mouseenter", () => { if (f.value !== selected) item.style.background = "var(--surface-hover)"; });
+        item.addEventListener("mouseleave", () => { if (f.value !== selected) item.style.background = ""; });
+
+        // Star
+        const star = document.createElement("span");
+        star.style.cssText = "cursor:pointer; font-size:14px; width:20px; text-align:center; transition:transform 0.15s, color 0.15s;";
+        star.textContent = isFav ? "★" : "☆";
+        star.style.color = isFav ? "#f6c343" : "var(--ink-muted)";
+        star.style.opacity = isFav ? "1" : "0.4";
+        star.addEventListener("mouseenter", () => { star.style.transform = "scale(1.3)"; star.style.opacity = "1"; });
+        star.addEventListener("mouseleave", () => { star.style.transform = ""; star.style.opacity = isFav ? "1" : "0.4"; });
+        star.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (favs.has(f.value)) favs.delete(f.value);
+          else favs.add(f.value);
+          buildList(search.value);
+        });
+
+        // Font name
+        const name = document.createElement("span");
+        name.style.cssText = "flex:1; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;";
+        name.style.fontFamily = '"' + f.value + '", sans-serif';
+        name.textContent = f.label;
+
+        // Sample text
+        const sample = document.createElement("span");
+        sample.style.cssText = "font-size:12px; color:var(--ink-muted); opacity:0.6;";
+        sample.style.fontFamily = '"' + f.value + '", sans-serif';
+        sample.textContent = "สวัสดี";
+
+        item.appendChild(star);
+        item.appendChild(name);
+        item.appendChild(sample);
+
+        item.addEventListener("click", () => {
+          selectFont(f);
+          closeDropdown();
+        });
+
+        return item;
+      }
+
+      function selectFont(f) {
+        selected = f.value;
+        label.textContent = f.label;
+        label.style.fontFamily = '"' + f.value + '", sans-serif';
+        const ff = '"' + f.value + '", sans-serif';
+        preview.style.fontFamily = ff;
+        bubble.style.fontFamily = ff;
+        sfx.style.fontFamily = ff;
+      }
+
+      function openDropdown() {
+        open = true;
+        dropdown.style.display = "block";
+        search.value = "";
+        buildList();
+        setTimeout(() => search.focus(), 50);
+      }
+
+      function closeDropdown() {
+        open = false;
+        dropdown.style.display = "none";
+      }
+
+      trigger.addEventListener("click", () => { open ? closeDropdown() : openDropdown(); });
+      search.addEventListener("input", () => buildList(search.value));
+      document.addEventListener("pointerdown", (e) => {
+        if (open && !trigger.contains(e.target) && !dropdown.contains(e.target)) closeDropdown();
+      });
+
+      // Font size slider
+      sizeSlider.addEventListener("input", () => {
+        const size = sizeSlider.value + "px";
+        sizeLabel.textContent = size;
+        preview.style.fontSize = size;
+      });
+
+      // Init with Kanit
+      selectFont(FONTS[0]);
+      buildList();
+    })();
+
+    // ─── Interactive Before/After Slider ───
+    (function () {
+      const container = document.getElementById("guideCompare");
+      const afterEl = document.getElementById("guideCompareAfter");
+      const sliderEl = document.getElementById("guideCompareSlider");
+      if (!container || !afterEl || !sliderEl) return;
+
+      let dragging = false;
+
+      function setPosition(percent) {
+        const clamped = Math.max(0, Math.min(100, percent));
+        afterEl.style.clipPath = `inset(0 0 0 ${clamped}%)`;
+        sliderEl.style.left = `${clamped}%`;
+      }
+
+      function getPercent(e) {
+        const rect = container.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        return ((clientX - rect.left) / rect.width) * 100;
+      }
+
+      container.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        setPosition(getPercent(e));
+        e.preventDefault();
+      });
+      document.addEventListener("pointermove", (e) => {
+        if (dragging) setPosition(getPercent(e));
+      });
+      document.addEventListener("pointerup", () => { dragging = false; });
+    })();
+  </script>
+</body>
+</html>
